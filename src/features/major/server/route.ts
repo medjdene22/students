@@ -6,7 +6,7 @@ import { insertMajorSchima, major } from "@/db/schema"
 import { AdditionalContext } from "@/lib/session-middleware"
 import { Role } from "@/lib/types"
 import { z } from "zod"
-import { eq } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
 
 
 
@@ -50,7 +50,7 @@ const app = new Hono<AdditionalContext>()
         }
         const { id } = c.req.valid('param')
         const { name } = c.req.valid('json')
-        const majorUpdated = await db
+        const [majorUpdated] = await db
             .update(major)
             .set({ name })
             .where(eq(major.id, id))
@@ -65,9 +65,24 @@ const app = new Hono<AdditionalContext>()
             return c.json({ error: 'Unauthorized' }, 401)
         }
         const { id } = c.req.valid('param')
-        const majorDeleted = await db
+        const [majorDeleted] = await db
             .delete(major)
             .where(eq(major.id, id))
+            .returning()
+        return c.json({ majorDeleted })
+    })
+
+    .post("/bulk", zValidator('json', z.object({ ids: z.array(z.number()) })), async (c) => {
+        const user = c.get("user")
+        if (!user || user.role !== Role.ADMIN) {
+            return c.json({ error: 'Unauthorized' }, 401)
+        }
+        const { ids } = c.req.valid('json')
+        const majorDeleted = await db
+            .delete(major)
+            .where(
+                inArray(major.id, ids)
+            )
             .returning()
         return c.json({ majorDeleted })
     })

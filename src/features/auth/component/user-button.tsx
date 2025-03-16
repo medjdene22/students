@@ -41,12 +41,11 @@ export const UserButton = () => {
     
     const { name, email} = user;
     const avatarFallback = name ? name.charAt(0).toUpperCase() : email.charAt(0).toUpperCase() ?? "U";
-    const image =0
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger className="outline-none relative">
                 <Avatar className="size-10 hover:opacity-75 transition-opacity border border-neutral-300">
-                    <AvatarImage src={image || ""} />
+                    <AvatarImage src={user.image || ""} />
                     <AvatarFallback className="bg-neutral-200 font-medium text-neutral-500 flex items-center justify-center">
                         {avatarFallback}
                     </AvatarFallback>
@@ -55,7 +54,7 @@ export const UserButton = () => {
             <DropdownMenuContent align="end" side="bottom" className="w-60 rounded-xl bg-white p-2 shadow-md " sideOffset={10}>
                 <div className="flex items-center flex-col justify-center gap-2 px-2.5 py-4 cursor-pointer">
                     <Avatar className="size-[52px] border border-neutral-300">
-                        <AvatarImage src={image || ""} />
+                        <AvatarImage src={user.image || ""} />
                         <AvatarFallback className="bg-neutral-200 text-xl font-medium text-neutral-500 flex items-center justify-center">
                             {avatarFallback}
                         </AvatarFallback>
@@ -71,7 +70,7 @@ export const UserButton = () => {
                 </div>
                 <Dotted className="mb-1  " />
                 <DropdownMenuItem onClick={() => logout()} className="h-10 flex items-center justify-center text-amber-700 font-medium cursor-pointer">
-                        <LogOut className="size-4 mr-2"/>
+                        <LogOut className="size-4"/>
                         <span>Logout</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/dashboard/settings')} className="h-10 flex items-center justify-center font-medium cursor-pointer">

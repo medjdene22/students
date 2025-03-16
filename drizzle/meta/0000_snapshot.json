@@ -1,5 +1,5 @@
 {
-  "id": "259e143a-bbdd-4632-82a5-f37097054daa",
+  "id": "205b2433-1321-47f1-8680-98d4c89e0e4f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -239,6 +239,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "cycle": {
+          "name": "cycle",
+          "type": "cycle",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
         "major_id": {
           "name": "major_id",
           "type": "integer",
@@ -291,23 +298,10 @@
           "primaryKey": false,
           "notNull": true
         },
-        "cycle": {
-          "name": "cycle",
-          "type": "cycle",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
         "year": {
           "name": "year",
           "type": "year",
           "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "major": {
-          "name": "major",
-          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -320,19 +314,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "student_group_major_major_id_fk": {
-          "name": "student_group_major_major_id_fk",
-          "tableFrom": "student_group",
-          "tableTo": "major",
-          "columnsFrom": [
-            "major"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
         "student_group_specialty_specialties_id_fk": {
           "name": "student_group_specialty_specialties_id_fk",
           "tableFrom": "student_group",
@@ -609,7 +590,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

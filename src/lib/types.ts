@@ -11,8 +11,8 @@ export const LoginSchema = z.object({
 export const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export enum Role {
-    ADMIN = "admin",
-    USER = "user",
-    STUDENT = "student",
-    TEACHER = "teacher"
+  ADMIN = "admin",
+  USER = "user",
+  STUDENT = "student",
+  TEACHER = "teacher"
 }

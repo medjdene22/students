@@ -1,10 +1,10 @@
 'use client'
 import ResponsiveModel from "@/components/responsive-model";
-import { useCreateMajorModel } from "../hooks/use-create-major-model";
 import { CreateMajorForm } from "./create-major-form";
+import { useCreateModel } from "@/hooks/use-create-model";
 
 export default function CreateMajorModel() {
-    const { isOpen, setIsOpen, onClose } = useCreateMajorModel();
+    const { isOpen, setIsOpen, onClose } = useCreateModel({query: "create-major"});
 
 
     return (

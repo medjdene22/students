@@ -6,7 +6,8 @@ import { insertStudentGroupSchima, studentGroup } from "@/db/schema"
 import { AdditionalContext } from "@/lib/session-middleware"
 import { Role } from "@/lib/types"
 import { z } from "zod"
-import { eq } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
+import { group } from "console"
 
 
 
@@ -21,7 +22,19 @@ const app = new Hono<AdditionalContext>()
         return c.json({groups})
     })
 
-    .get("/:specialtyId", zValidator('param', z.object({ specialtyId: z.coerce.number()  })), async (c) => {
+    .get("/:id", zValidator('param', z.object({ id: z.coerce.number()  })), async (c) => {
+        const user = c.get("user")
+        if (!user || user.role !== Role.ADMIN) {
+            return c.json({ error: 'Unauthorized' }, 401)
+        }
+        const { id } = c.req.valid('param')
+        const [group] = await db
+            .select().from(studentGroup)
+            .where(eq(studentGroup.id, id))
+        return c.json({group})
+    })
+
+    .get("/specialty/:specialtyId", zValidator('param', z.object({ specialtyId: z.coerce.number()  })), async (c) => {
         const user = c.get("user")
         if (!user || user.role !== Role.ADMIN) {
             return c.json({ error: 'Unauthorized' }, 401)
@@ -39,7 +52,7 @@ const app = new Hono<AdditionalContext>()
             return c.json({ error: 'Unauthorized' }, 401)
         }
         const values = c.req.valid('json')
-        const groupCreated = await db.insert(studentGroup).values({ ...values }).returning()
+        const [groupCreated] = await db.insert(studentGroup).values({ ...values }).returning()
 
         return c.json({ groupCreated })
     })
@@ -51,7 +64,7 @@ const app = new Hono<AdditionalContext>()
         }
         const { id } = c.req.valid('param')
         const values = c.req.valid('json')
-        const groupUpdated = await db
+        const [groupUpdated] = await db
             .update(studentGroup)
             .set({ ...values })
             .where(eq(studentGroup.id, id))
@@ -66,11 +79,26 @@ const app = new Hono<AdditionalContext>()
             return c.json({ error: 'Unauthorized' }, 401)
         }
         const { id } = c.req.valid('param')
-        const groupDeleted = await db
+        const [groupDeleted] = await db
             .delete(studentGroup)
             .where(eq(studentGroup.id, id))
             .returning()
         return c.json({ groupDeleted })
+    })
+
+    .post("/bulk", zValidator('json', z.object({ ids: z.array(z.number()) })), async (c) => {
+                const user = c.get("user")
+                if (!user || user.role !== Role.ADMIN) {
+                    return c.json({ error: 'Unauthorized' }, 401)
+                }
+                const { ids } = c.req.valid('json')
+                const groupsDeleted = await db
+                    .delete(studentGroup)
+                    .where(
+                        inArray(studentGroup.id, ids)
+                    )
+                    .returning()
+                return c.json({ groupsDeleted })
     })
 
 

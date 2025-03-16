@@ -4,7 +4,7 @@ import { client } from "@/lib/hono";
 export const useGetMajor = ({id}: {id: string}) => {
 
     const query = useQuery({
-        queryKey: ["major"],
+        queryKey: ["major", id],
         queryFn: async () => {
 
             const response = await client.api.major[":id"]['$get']({param: {id}});

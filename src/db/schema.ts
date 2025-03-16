@@ -1,10 +1,12 @@
-import { pgTable, text, timestamp, boolean, pgEnum, serial, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum, serial, integer, date } from "drizzle-orm/pg-core";
 import { createInsertSchema} from "drizzle-zod"
 
 export const roleEnum = pgEnum("role", ["admin", "user", "student", "teacher"]);
 export const sectionEnum = pgEnum("section", ["section1", "section2", "section3", "section4", "section5"]);
 export const cycleEnum = pgEnum("cycle", ["license", "master", "engineer", "PhD"]);
 export const yearEnum = pgEnum("year", ["first", "second", "third", "fourth", "fifth"]);
+export const teacherGradeEnum = pgEnum("teacher_grade", ["mcb", "mca", "professor", "substitute"]);
+
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -19,7 +21,7 @@ export const user = pgTable("user", {
     banned: boolean('banned'),
     banReason: text('ban_reason'),
     banExpires: timestamp('ban_expires'),
-    groupId: integer('group_id').references(()=> studentGroup.id),
+    
 });
 
 export const session = pgTable("session", {
@@ -68,6 +70,7 @@ export const insertMajorSchima = createInsertSchema(major);
 export const specialties = pgTable("specialties", {
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
+    cycle: cycleEnum("cycle").notNull(),
     majorId: integer("major_id").references( ()=> major.id , {
       onDelete: "cascade"
     }).notNull()
@@ -78,16 +81,34 @@ export const studentGroup = pgTable("student_group", {
   id: serial("id").primaryKey(),
   name: text('name').notNull(),
   section: sectionEnum("section").notNull(),
-  cycle: cycleEnum("cycle").notNull(),
   year: yearEnum("year").notNull(),
-  majorId: integer('major').references( ()=> major.id , {
-    onDelete: "cascade"
-  }).notNull(),
   specialtyId: integer('specialty').references( ()=> specialties.id , {
     onDelete: "cascade"
   }).notNull(),
 });
 export const insertStudentGroupSchima = createInsertSchema(studentGroup);
+
+export const studentInformation = pgTable("student_info", {
+  id: serial("id").primaryKey(),
+  studentId: text('student_id').references(()=> user.id, {
+    onDelete: "cascade"
+  }).notNull(),
+  groupId: integer('group_id').references(()=> studentGroup.id, {
+    onDelete: "set null"
+  }),
+
+});
+export const insertStudentInfoSchima = createInsertSchema(studentInformation);
+
+  export const teacherInformation = pgTable("teacher_info", {
+    id: serial("id").primaryKey(),
+    teacherId: text('teacher_id').references(()=> user.id, {
+      onDelete: "cascade"
+    }).notNull(),
+    grade: teacherGradeEnum("grade").notNull(),
+  });
+  export const insertTeacherInfoSchima = createInsertSchema(teacherInformation);
+
 
 export const subject = pgTable("subject", {
     id: serial("id").primaryKey(),
@@ -108,4 +129,3 @@ export const teacherSubjectGroup = pgTable("teacher_subject_group", {
     subjectId: integer('subject_id').references(()=> subject.id).notNull(),
     groupId: integer('group_id').references(()=> studentGroup.id).notNull(),
 });
-

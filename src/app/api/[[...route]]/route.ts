@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
-import { cors } from "hono/cors";
 
 import { auth } from '@/lib/auth';
 import { sessionMiddleware } from '@/lib/session-middleware';
@@ -8,6 +7,8 @@ import authentication from '@/features/auth/server/route';
 import major from '@/features/major/server/route';
 import specialtie from '@/features/specialtie/server/route';
 import group from '@/features/student-group/server/route';
+import student from '@/features/students/server/route';
+import teacher from '@/features/teachers/server/route';
 
 const app = new Hono().basePath('/api')
 
@@ -16,23 +17,29 @@ const routes = app
     .on(["POST", "GET"], "/auth/*", (c) => {
         return auth.handler(c.req.raw);
     })
-    .use(
-        "/api/auth/*", // or replace with "*" to enable cors for all routes
-        cors({
-            origin: "http://localhost:3001", // replace with your origin
-            allowHeaders: ["Content-Type", "Authorization"],
-            allowMethods: ["POST", "GET", "OPTIONS"],
-            exposeHeaders: ["Content-Length"],
-            maxAge: 600,
-            credentials: true,
-        }),
-    )
     .route("/authentication", authentication)
     .route("/major", major)
     .route("/specialtie", specialtie)
     .route("/group", group)
-routes.get('test', async (c) => {
-    return c.json({test: 'test ok'})
+    .route("/student", student)
+    .route("/teacher", teacher)
+
+routes.get('/test', async (c) => {
+    const users = await auth.api.listUsers({headers: c.req.raw.headers, query: {}});
+        // {
+        //     headers: c.req.raw.headers,
+        //     body: {
+        //         email: 'test3@imad.ma',
+        //         name: 'test3',
+        //         password: '123456',
+        //         role: 'student',
+        //         data: {
+        //             username: 'test3',
+        //         }
+        //     }
+        // }
+    
+    return c.json({users})
 })
     
 export const GET = handle(app)

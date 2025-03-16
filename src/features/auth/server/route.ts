@@ -11,7 +11,6 @@ const app = new Hono<AdditionalContext>()
         if (!user) {
             return c.json({ error: 'Unauthorized' }, 401)
         }
-        console.log(user)
         return c.json({ user, session })
     })
     .post("/", zValidator('json', LoginSchema), async (c) => {

@@ -35,7 +35,8 @@ export function CreateMajorForm({ onCancel }: Props) {
         mutate({json: data},{
             onSuccess: ({data}) => {
                 form.reset();
-                router.push(`/dashboard/majors/${data.id}`)
+                onCancel?.();
+                // router.push(`/dashboard/majors/${data.id}`)
             },
             
         });

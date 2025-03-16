@@ -16,14 +16,7 @@ export const auth = betterAuth({
         username(), 
         admin()
     ] ,
-    user: {
-        additionalFields: {
-            groupId: {
-                type: "string",
-                required: false,
-            }
-        }
-    }
+    trustedOrigins:['http://192.168.0.100:3000']
 })
 
 export type Auth = typeof auth;
