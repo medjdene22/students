@@ -122,7 +122,7 @@ const app = new Hono<AdditionalContext>()
             .set({ 
                 grade: values.grade
             })
-            .where(eq(teacherInformation.teacherId, id))
+            .where(eq(teacherInformation.teacherId, updatedUser.id))
             .returning()
         
         return c.json({ 

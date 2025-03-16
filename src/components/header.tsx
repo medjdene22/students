@@ -5,8 +5,6 @@ import { SidebarTrigger } from "./ui/sidebar"
 import { UserButton } from "@/features/auth/component/user-button"
 import { Role } from "@/lib/types"
 import { usePathname } from "next/navigation"
-import { is } from "drizzle-orm"
-
 
 export default function Header(){
     const role = authClient.useSession().data?.user.role;
@@ -16,7 +14,7 @@ export default function Header(){
     let isMajor = false
     let isSpecialties = false
     let isGroups = false
-    let isGroup = false
+    // let isGroup = false
 
     if(path.includes('majors')){
         isMajors = true

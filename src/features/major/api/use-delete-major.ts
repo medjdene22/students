@@ -3,8 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { InferRequestType, InferResponseType } from "hono";
 import { toast } from "sonner";
 
-import { z } from "zod"
-
 type ResponseType = InferResponseType<typeof client.api.major[':id']['$delete'], 200>
 type RequestType = InferRequestType<typeof client.api.major[':id']['$delete']>
 

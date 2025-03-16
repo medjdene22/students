@@ -29,7 +29,7 @@ export default function TeachersList() {
 
             <CardContent className='flex-1 overflow-auto'>
                 <DataTable 
-                    disabled={isLoading} 
+                    disabled={isDisabled} 
                     columns={columns} 
                     data={teachers ?? []} 
                     filterKeys={["name", "email"]} 

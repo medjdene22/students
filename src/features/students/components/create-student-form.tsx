@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 import { useCreateStudent } from "../api/use-create-student";
@@ -37,7 +37,7 @@ export function CreateStudentForm({ groupId, groupOptions, onCancel }: Props) {
 
     const { mutate, isPending} = useCreateStudent();
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const onSubmit = (data: z.infer<typeof createStudentSchima>) => {
         const groupId = Number(data.groupId) === 0 ? null : Number(data.groupId)
@@ -47,6 +47,7 @@ export function CreateStudentForm({ groupId, groupOptions, onCancel }: Props) {
         }
         mutate({json: finalData},{
             onSuccess: ({student}) => {
+                console.log(student)
                 form.reset();
                 onCancel?.()
                 // router.push(`/dashboard/majors/${groupCreated.majorId}/specialties/${groupCreated.specialtyId}/groups/${groupCreated.id}`)

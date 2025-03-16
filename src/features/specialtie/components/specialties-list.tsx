@@ -1,5 +1,5 @@
 'use client'
-import { Dotted } from "@/components/dotted";
+// import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMajorId } from "@/features/major/hooks/use-major-id";

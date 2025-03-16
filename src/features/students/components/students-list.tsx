@@ -32,7 +32,7 @@ export default function StudentsList() {
             </CardHeader>
 
             <CardContent className='flex-1 overflow-auto'>
-                <DataTable disabled={isLoading} columns={columns} data={students ?? []} filterKeys={["name"]} onDelete={
+                <DataTable disabled={isDisabled} columns={columns} data={students ?? []} filterKeys={["name"]} onDelete={
                         (rows) => {
                             deleteStudents({
                                 json: {

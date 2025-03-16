@@ -1,5 +1,4 @@
-import { parseAsBoolean, parseAsString, useQueryState} from 'nuqs'
-import { string } from 'zod'
+import { parseAsString, useQueryState} from 'nuqs'
 
 export const useEditModel = ({query}: {query: string}) => {
     const [id, setId] = useQueryState(

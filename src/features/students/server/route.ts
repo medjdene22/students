@@ -134,7 +134,7 @@ const app = new Hono<AdditionalContext>()
 
             const ctx = await auth.$context
             const hashedPassword = await ctx.password.hash(values.password)
-            await ctx.internalAdapter.updatePassword(id, hashedPassword)
+            await ctx.internalAdapter.updatePassword(updatedUser.id, hashedPassword)
             console.log("password updated")
         }
         
@@ -144,7 +144,7 @@ const app = new Hono<AdditionalContext>()
             .set({ 
                 groupId: values.groupId
             })
-            .where(eq(studentInformation.studentId, id))
+            .where(eq(studentInformation.studentId, updatedUser.id))
             .returning()
         
         

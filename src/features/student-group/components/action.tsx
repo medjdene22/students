@@ -16,7 +16,7 @@ import { useMajorId } from '@/features/major/hooks/use-major-id'
 
 export const Action = ({id, specialtyId, children}: {id: number, specialtyId: number, children: React.ReactNode}) => {
 
-    const { mutate, isPending } = useDeleteGroup();
+    const { mutate } = useDeleteGroup();
     const [ConfiramtionDialog, confirm] = useConfirm("Are you sure?","you are about to delete this group", 'destructive');
 
     const router = useRouter();

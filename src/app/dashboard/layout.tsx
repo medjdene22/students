@@ -4,7 +4,7 @@ import Header from "@/components/header";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
+  // SidebarTrigger,
 } from "@/components/ui/sidebar"
 
 

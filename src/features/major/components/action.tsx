@@ -15,7 +15,7 @@ import { useEditModel } from '@/hooks/use-edit-model'
 
 export const Action = ({id, children} : {id : number, children: React.ReactNode}) => {
 
-    const { mutate, isPending } = useDeleteMajor();
+    const { mutate } = useDeleteMajor();
     const [ConfiramtionDialog, confirm] = useConfirm("Are you sure?","you are about to delete this major", 'destructive');
 
     const router = useRouter();

@@ -1,8 +1,7 @@
 'use client'
-import { Dotted } from "@/components/dotted";
+// import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMajorId } from "@/features/major/hooks/use-major-id";
 import { PlusIcon } from "lucide-react";
 import { useCreateModel } from "@/hooks/use-create-model";
 import { DataTable } from "@/components/data-table";

@@ -10,7 +10,7 @@ import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { BookOpenText } from "lucide-react";
 import { useEditSpecialtie } from "../api/use-edit-specialtie";
@@ -32,7 +32,7 @@ export function SpecialtieForm({ onCancel, initialValues }: Props) {
 
     const { mutate, isPending} = useEditSpecialtie();
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const onSubmit = (data: z.infer<typeof createSpecialtieSchema>) => {
         mutate({
@@ -42,6 +42,7 @@ export function SpecialtieForm({ onCancel, initialValues }: Props) {
             }
         },{
             onSuccess: ({specialtieUpdated}) => {
+                console.log(specialtieUpdated)
                 form.reset();
                 // router.push(`/dashboard/majors/${specialtieCreated.majorId}/specialties/${specialtieCreated.id}`)
                 onCancel?.();

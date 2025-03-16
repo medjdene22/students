@@ -131,7 +131,7 @@ export const columns: ColumnDef<ResponseType>[] = [
         return (
 
           
-        <Action id={id} groupId={row.original.groupId!}>
+        <Action id={id}>
                 <Button variant='ghost' className="size-8 p-0">
                     <MoreHorizontal className='size-4'/>
                 </Button>

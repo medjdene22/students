@@ -4,8 +4,6 @@ import { Loader } from "lucide-react";
 import { useGetSpecialtie } from "../api/use-get-specialtie";
 import { Card, CardContent } from "@/components/ui/card";
 import { SpecialtieForm } from "./edit-specialtie-form";
-import { createSpecialtieSchema, CYCLE } from "../schema";
-import { z } from "zod";
 
 
 interface UpdateMajorWrapperFormProps {

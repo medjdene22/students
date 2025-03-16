@@ -21,7 +21,7 @@ export const useEditStudent = () => {
       toast.success("Student updated successfully");
       queryClient.invalidateQueries({ queryKey: ["students"] });
       queryClient.invalidateQueries({ queryKey: ["students", studentUpdated.groupId?.toString()] });
-      queryClient.invalidateQueries({ queryKey: ["student", studentUpdated.id] });
+      // queryClient.invalidateQueries({ queryKey: ["student", studentUpdated.id] });
     },
     onError: (error) => {
       toast.error(error.message);

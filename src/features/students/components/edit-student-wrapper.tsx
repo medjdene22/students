@@ -1,7 +1,7 @@
 import { Loader } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { EditStudentForm } from "./edit-student-form";
-import { useGetStudentsByGroup } from "../api/use-get-student-by-group";
+// import { useGetStudentsByGroup } from "../api/use-get-student-by-group";
 import { useGetStudent } from "../api/use-get-student";
 import { useGetGroupsBySpecialty } from "@/features/student-group/api/use-get-groups-by-specialty";
 import { useSpecialtieId } from "@/features/specialtie/hooks/use-specialtie-id";

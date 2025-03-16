@@ -3,6 +3,13 @@ import { Book, BookOpen, UserCog } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+export enum Grade {
+    MCB = "mcb",
+    MCA = "mca",
+    Professor = "professor",
+    Substitute = "substitute",
+}
+
 interface TeacherAvatarProps {
     name: string;
     grade?: string;
@@ -26,9 +33,9 @@ const avatarVariants = cva(
     }
 );
 
-export default function TeacherAvatar({ name, grade = "mcb", classname }: TeacherAvatarProps) {
+export default function TeacherAvatar({ grade = "mcb", classname }: TeacherAvatarProps) {
     return (
-        <Avatar className={cn("border-0", classname, avatarVariants({ grade: grade as any }))}>
+        <Avatar className={cn("border-0", classname, avatarVariants({ grade: grade as "mcb" | "mca" | "professor" | "substitute" }))}>
             <AvatarFallback>
                 {getIconByGrade(grade)}
             </AvatarFallback>

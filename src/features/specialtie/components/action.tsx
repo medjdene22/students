@@ -15,7 +15,7 @@ import { useDeleteSpecialtie } from '../api/use-delete-specialtie'
 
 export const Action = ({id, majorId, children}: {id: number, majorId: number, children: React.ReactNode}) => {
 
-    const { mutate, isPending } = useDeleteSpecialtie();
+    const { mutate } = useDeleteSpecialtie();
     const [ConfiramtionDialog, confirm] = useConfirm("Are you sure?","you are about to delete this specialtie", 'destructive');
 
     const router = useRouter();

@@ -9,20 +9,20 @@ import {
   } from "@/components/ui/dropdown-menu"
 import { ExternalLinkIcon, PencilIcon,TrashIcon } from 'lucide-react'
 import { useConfirm } from '@/hooks/use-conform'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { useEditModel } from '@/hooks/use-edit-model'
-import { useMajorId } from '@/features/major/hooks/use-major-id'
+// import { useMajorId } from '@/features/major/hooks/use-major-id'
 import { useDeleteStudent } from '../api/use-delete-student'
 
-export const Action = ({id, groupId, children}: {id: string, groupId: number, children: React.ReactNode}) => {
+export const Action = ({id, children}: {id: string, children: React.ReactNode}) => {
 
-    const { mutate, isPending } = useDeleteStudent();
+    const { mutate } = useDeleteStudent();
     const [ConfiramtionDialog, confirm] = useConfirm("Are you sure?","you are about to delete this student", 'destructive');
 
-    const router = useRouter();
+    // const router = useRouter();
     const { open } = useEditModel({ query: 'edit-student' });
 
-    const majorId = useMajorId();
+    // const majorId = useMajorId();
 
 
     const handleOpenGroup = async () => {

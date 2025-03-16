@@ -18,6 +18,7 @@ export const useCreateTeacher = () => {
       return await response.json();
     },
     onSuccess: ({teacher}) => {
+      console.log(teacher)
       toast.success("Teacher created");
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },

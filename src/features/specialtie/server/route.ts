@@ -2,7 +2,7 @@ import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 
 import { db } from "@/db"
-import { insertSpecialtiesSchima, specialties as specialtie, major } from "@/db/schema"
+import { insertSpecialtiesSchima, specialties as specialtie } from "@/db/schema"
 import { AdditionalContext } from "@/lib/session-middleware"
 import { Role } from "@/lib/types"
 import { z } from "zod"

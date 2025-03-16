@@ -1,6 +1,6 @@
 'use client'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createGroupSchima, CYCLE, SECTION, YEAR } from "../schema";
+import { createGroupSchima, SECTION, YEAR } from "../schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import SpecialtyAvatar from "@/features/specialtie/components/specialty-avatar";
 
@@ -38,7 +38,7 @@ export function GroupForm({initialValues, specialtyOptions, onCancel }: Props) {
 
     const { mutate, isPending} = useEditGroup();
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const onSubmit = (data: z.infer<typeof createGroupSchima>) => {
         const finalData = {
@@ -52,6 +52,7 @@ export function GroupForm({initialValues, specialtyOptions, onCancel }: Props) {
             }
         },{
             onSuccess: ({groupUpdated}) => {
+                console.log(groupUpdated)
                 form.reset();
                 onCancel?.()
                 // router.push(`/dashboard/majors/${groupCreated.majorId}/specialties/${groupCreated.specialtyId}/groups/${groupCreated.id}`)

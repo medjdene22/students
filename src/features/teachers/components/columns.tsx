@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { client } from "@/lib/hono"
 import { InferResponseType } from "hono"
 import { Action } from "./action"
-// import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import TeacherAvatar from "./teacher-avatar"
 
 // Define the type based on the API response
@@ -139,9 +139,9 @@ export const columns: ColumnDef<ResponseType>[] = [
     },
     cell: ({ row }) => (
       <span className="font-medium pl-4">
-        {/* <Badge variant={getGradeVariant(row.original.grade)}> */}
+        <Badge variant={getGradeVariant(row.original.grade)}>
           {formatGrade(row.original.grade)}
-        {/* </Badge> */}
+        </Badge>
       </span>
     )
   },

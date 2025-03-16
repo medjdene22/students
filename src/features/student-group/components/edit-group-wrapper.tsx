@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { GroupForm } from "./edit-group-form";
 import { useGetGroup } from "../api/use-get-group";
 import { useGetSpecialtiesByMajor } from "@/features/specialtie/api/use-get-specialties-by-major";
-import { useMajorId } from "@/features/major/hooks/use-major-id";
 import { useGetSpecialtie } from "@/features/specialtie/api/use-get-specialtie";
 
 
@@ -17,9 +16,16 @@ export const EditGroupWrapper = ({ onCancel, groupId }: UpdateMajorWrapperFormPr
 
 
     const { data, isLoading: isLoadingGroup } = useGetGroup({id: groupId});
-    const { data: specialty, isLoading: isLoadingSpecialty } = useGetSpecialtie({id: data?.specialtyId.toString()!});
-    const { data: specialties, isLoading: isLoadingOptions } = useGetSpecialtiesByMajor({majorId: specialty?.majorId.toString()!});
+    const specialtyId = data?.specialtyId?.toString();
+    const { data: specialty, isLoading: isLoadingSpecialty } = useGetSpecialtie(
+        specialtyId ? {id: specialtyId} : {id: ''}
+    );
     
+    const majorId = specialty?.majorId?.toString();
+    const { data: specialties, isLoading: isLoadingOptions } = useGetSpecialtiesByMajor(
+        majorId ? {majorId: majorId} : {majorId: ''}
+    );
+
     const specialtyOptions = specialties?.map(specialty => ({
         id: specialty.id.toString(),
         name: specialty.name,

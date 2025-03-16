@@ -9,7 +9,7 @@ import {
   } from "@/components/ui/dropdown-menu"
 import { ExternalLinkIcon, PencilIcon, TrashIcon } from 'lucide-react'
 import { useConfirm } from '@/hooks/use-conform'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { useEditModel } from '@/hooks/use-edit-model'
 import { useDeleteTeacher } from '../api/use-delete-teacher'
 
@@ -17,7 +17,7 @@ export const Action = ({id, children}: {id: string, children: React.ReactNode}) 
     const { mutate, isPending } = useDeleteTeacher();
     const [ConfiramtionDialog, confirm] = useConfirm("Are you sure?","You are about to delete this teacher", 'destructive');
 
-    const router = useRouter();
+    // const router = useRouter();
     const { open } = useEditModel({ query: 'edit-teacher' });
 
     const handleOpenTeacher = async () => {

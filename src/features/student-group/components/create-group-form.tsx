@@ -1,6 +1,6 @@
 'use client'
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createGroupSchima, CYCLE, SECTION, YEAR } from "../schema";
+import { createGroupSchima, SECTION, YEAR } from "../schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
@@ -10,12 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useCreateGroup } from "../api/use-create-group";
 import SpecialtyAvatar from "@/features/specialtie/components/specialty-avatar";
 
-import { Users, BookOpenText, Calendar } from "lucide-react";
+import { Users, Calendar } from "lucide-react";
 
 interface Props {
     majorId: number;
@@ -25,7 +25,7 @@ interface Props {
     onCancel?: () => void;
 }
 
-export function CreateGroupForm({ majorId, specialtyId, specialtyOptions, onCancel }: Props) {
+export function CreateGroupForm({  specialtyId, specialtyOptions, onCancel }: Props) {
 
     const form = useForm<z.infer<typeof createGroupSchima>>({
         defaultValues: {
@@ -37,7 +37,7 @@ export function CreateGroupForm({ majorId, specialtyId, specialtyOptions, onCanc
 
     const { mutate, isPending} = useCreateGroup();
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const onSubmit = (data: z.infer<typeof createGroupSchima>) => {
         const finalData = {
@@ -46,6 +46,7 @@ export function CreateGroupForm({ majorId, specialtyId, specialtyOptions, onCanc
         }
         mutate({json: finalData},{
             onSuccess: ({groupCreated}) => {
+                console.log(groupCreated)
                 form.reset();
                 onCancel?.()
                 // router.push(`/dashboard/majors/${groupCreated.majorId}/specialties/${groupCreated.specialtyId}/groups/${groupCreated.id}`)

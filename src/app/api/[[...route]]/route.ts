@@ -24,7 +24,7 @@ const routes = app
     .route("/student", student)
     .route("/teacher", teacher)
 
-routes.get('/test', async (c) => {
+routes.get('/users', async (c) => {
     const users = await auth.api.listUsers({headers: c.req.raw.headers, query: {}});
         // {
         //     headers: c.req.raw.headers,
@@ -41,6 +41,24 @@ routes.get('/test', async (c) => {
     
     return c.json({users})
 })
+// routes.get('/create_user', async (c) => {
+//     const user = await auth.api.signUpEmail(
+        
+//         {
+//             headers: c.req.raw.headers,
+//             body: {
+//                 email: 'admin@admin.com',
+//                 name: 'admin',
+//                 password: 'imadimad',
+//                 role: 'student',
+//                 data: {
+//                     username: 'admin',
+//                 }
+//             }
+//         })
+    
+//     return c.json({user})
+// })
     
 export const GET = handle(app)
 export const POST = handle(app)

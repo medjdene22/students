@@ -4,7 +4,7 @@ import { Loader } from "lucide-react";
 import { CreateGroupForm } from "./create-group-form";
 import { useGetSpecialtiesByMajor } from "@/features/specialtie/api/use-get-specialties-by-major";
 import { useMajorId } from "@/features/major/hooks/use-major-id";
-import { use } from "react";
+
 import { useSpecialtieId } from "@/features/specialtie/hooks/use-specialtie-id";
 
 

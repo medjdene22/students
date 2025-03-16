@@ -10,7 +10,7 @@ import { Form, FormControl, FormItem, FormLabel, FormField, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -28,12 +28,13 @@ export function CreateMajorForm({ onCancel }: Props) {
 
     const { mutate, isPending} = useCreateMajor();
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const onSubmit = (data: z.infer<typeof createMajorSchema>) => {
 
         mutate({json: data},{
             onSuccess: ({data}) => {
+                console.log(data)
                 form.reset();
                 onCancel?.();
                 // router.push(`/dashboard/majors/${data.id}`)

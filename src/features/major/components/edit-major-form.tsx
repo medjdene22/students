@@ -9,7 +9,7 @@ import { Form, FormControl, FormItem, FormLabel, FormField, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Dotted } from "@/components/dotted";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useEditMajor } from "../api/use-edit-major";
 
@@ -29,13 +29,14 @@ export function EditMajorForm({ initialMajor, onCancel }: Props) {
 
     const { mutate, isPending} = useEditMajor();
 
-    const router = useRouter();
+    // const router = useRouter();
 
     const onSubmit = (data: z.infer<typeof createMajorSchema>) => {
 
         mutate({json: data, param: {id: initialMajor.id.toString()}},{
 
             onSuccess: ({majorUpdated}) => {
+                console.log(majorUpdated)
                 form.reset();
                 onCancel?.();
                 // router.push(`/dashboard/majors/${data.id}`)

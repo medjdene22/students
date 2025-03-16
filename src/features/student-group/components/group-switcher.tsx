@@ -16,7 +16,6 @@ import MajorAvatar from "@/features/major/components/major-avatar"
 import { useRouter } from "next/navigation"
 
 import { useCreateModel } from "@/hooks/use-create-model"
-import CreateGroupModel from "./create-group-model"
 import { useSpecialtieId } from "@/features/specialtie/hooks/use-specialtie-id"
 import { useGetGroupId } from "../hooks/use-group-id"
 import { useGetGroupsBySpecialty } from "../api/use-get-groups-by-specialty"
