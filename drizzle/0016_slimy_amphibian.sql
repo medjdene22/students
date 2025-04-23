@@ -1,0 +1,1 @@
+ALTER TABLE "student_subject_event" ADD COLUMN "event_date" date;

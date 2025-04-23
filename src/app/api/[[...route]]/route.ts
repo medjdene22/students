@@ -9,6 +9,12 @@ import specialtie from '@/features/specialtie/server/route';
 import group from '@/features/student-group/server/route';
 import student from '@/features/students/server/route';
 import teacher from '@/features/teachers/server/route';
+import subject from '@/features/subject/server/route';
+import teacherAssignment from '@/features/teacher-assignment/server/route';
+
+import teacherUser from '@/features/teacher-user/server/route';
+import studentUser from '@/features/student-user/server/route';
+import test from '@/features/test/server/route';
 
 const app = new Hono().basePath('/api')
 
@@ -23,6 +29,11 @@ const routes = app
     .route("/group", group)
     .route("/student", student)
     .route("/teacher", teacher)
+    .route("/subject", subject)
+    .route("/teacherAssignment", teacherAssignment)
+    .route("/teacherUser", teacherUser)
+    .route("/studentUser", studentUser)
+    .route("/test", test)
 
 routes.get('/users', async (c) => {
     const users = await auth.api.listUsers({headers: c.req.raw.headers, query: {}});

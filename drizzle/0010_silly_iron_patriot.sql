@@ -1,0 +1,1 @@
+ALTER TABLE "specialty_subject" ADD CONSTRAINT "specialty_subject_unique" UNIQUE("specialty_id","subject_id","year");

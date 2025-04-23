@@ -8,6 +8,8 @@ export type AdditionalContext = {
     Variables: {
         user: User | null,
         session: Session | null
+        teacher: User
+        student: User
     }
 }
 

@@ -8,14 +8,13 @@ import { eq, inArray } from "drizzle-orm"
 import { createStudentSchima, editStudentSchema } from "../schema"
 import { auth } from "@/lib/auth"
 import { z } from "zod"
+import { adminMiddleware } from "@/lib/admin-middleware"
 
 
 const app = new Hono<AdditionalContext>()
+    .use(adminMiddleware)
     .get("/", async (c) => {
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const studentsSelected = await db
         .select({
             id: user.id,
@@ -32,10 +31,7 @@ const app = new Hono<AdditionalContext>()
     })
 
     .get("/:id", zValidator('param', z.object({ id: z.string() })), async (c) => {
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const {id} = c.req.valid('param')
         const [studentSelected] = await db
         .select({
@@ -54,10 +50,7 @@ const app = new Hono<AdditionalContext>()
     })
 
     .get("/group/:id", zValidator('param', z.object({ id: z.coerce.number()  })), async (c) => {
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { id } = c.req.valid('param')
         const studentsSelected = await db
             .select({
@@ -76,10 +69,6 @@ const app = new Hono<AdditionalContext>()
     })
 
     .post("/", zValidator('json', createStudentSchima), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
 
         const values = c.req.valid('json')
         const userCreated = await auth.api.createUser({
@@ -112,11 +101,7 @@ const app = new Hono<AdditionalContext>()
 
     .patch("/:id", zValidator('param', z.object({ id: z.string() })), zValidator('json', editStudentSchema), async (c) => {
 
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
-        
+
         const { id } = c.req.valid('param')
         const values = c.req.valid('json')
         
@@ -156,10 +141,7 @@ const app = new Hono<AdditionalContext>()
     })
     
     .delete("/:id", zValidator('param', z.object({ id: z.string() })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { id } = c.req.valid('param')
         const [deletedStudentInfo] = await db.delete(studentInformation).where(eq(studentInformation.studentId, id)).returning()
 
@@ -175,10 +157,7 @@ const app = new Hono<AdditionalContext>()
     })
 
     .post("/bulk", zValidator('json', z.object({ ids: z.array(z.string()) })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { ids } = c.req.valid('json')
         const deletedStudentsInfo = await db
             .delete(studentInformation)

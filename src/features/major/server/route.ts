@@ -4,28 +4,20 @@ import { zValidator } from "@hono/zod-validator"
 import { db } from "@/db"
 import { insertMajorSchima, major } from "@/db/schema"
 import { AdditionalContext } from "@/lib/session-middleware"
-import { Role } from "@/lib/types"
 import { z } from "zod"
 import { eq, inArray } from "drizzle-orm"
-
-
-
+import { adminMiddleware } from "@/lib/admin-middleware"
 
 const app = new Hono<AdditionalContext>()
+    .use(adminMiddleware)
     .get("/", async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const majors = await db.select().from(major)
         return c.json({majors})
     })
 
     .get("/:id", zValidator('param', z.object({ id: z.coerce.number()  })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { id } = c.req.valid('param')
         const [majorSelected] = await db.select().from(major).where(eq(major.id, id))
         return c.json({ majorSelected })
@@ -33,10 +25,7 @@ const app = new Hono<AdditionalContext>()
         
 
     .post("/", zValidator('json', insertMajorSchima.pick({ name: true })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { name } = c.req.valid('json')
         const [majorCreated] = await db.insert(major).values({ name }).returning()
 
@@ -44,10 +33,7 @@ const app = new Hono<AdditionalContext>()
     })
 
     .patch("/:id", zValidator('param', z.object({ id: z.coerce.number()  })), zValidator('json', insertMajorSchima.pick({ name: true })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { id } = c.req.valid('param')
         const { name } = c.req.valid('json')
         const [majorUpdated] = await db
@@ -60,10 +46,7 @@ const app = new Hono<AdditionalContext>()
     })
 
     .delete("/:id", zValidator('param', z.object({ id: z.coerce.number()  })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { id } = c.req.valid('param')
         const [majorDeleted] = await db
             .delete(major)
@@ -73,10 +56,7 @@ const app = new Hono<AdditionalContext>()
     })
 
     .post("/bulk", zValidator('json', z.object({ ids: z.array(z.number()) })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
+
         const { ids } = c.req.valid('json')
         const majorDeleted = await db
             .delete(major)

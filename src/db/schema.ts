@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum, serial, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum, serial, integer, unique, bigserial, date } from "drizzle-orm/pg-core";
 import { createInsertSchema} from "drizzle-zod"
 
 export const roleEnum = pgEnum("role", ["admin", "user", "student", "teacher"]);
@@ -7,6 +7,8 @@ export const cycleEnum = pgEnum("cycle", ["license", "master", "engineer", "PhD"
 export const yearEnum = pgEnum("year", ["first", "second", "third", "fourth", "fifth"]);
 export const teacherGradeEnum = pgEnum("teacher_grade", ["mcb", "mca", "professor", "substitute"]);
 
+export const assessmentTypeEnum = pgEnum("assessment_type", ["exam", "td", "tp"]);
+export const EventEnum = pgEnum("event", ["absence", "absence_justified", "participation", "absence_test", "absence_test_justificated", "absence_exam", "absence_exam_justificated"]);
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -116,16 +118,73 @@ export const subject = pgTable("subject", {
 });
 export const insertSubjectSchima = createInsertSchema(subject);
 
-export const teacherSubject = pgTable("teacher_subject", {
-    id: serial("id").primaryKey(),
-    subjectId: integer('subject_id').references(()=> subject.id).notNull(),
-    teacherId: text('teacher_id').references(()=> user.id).notNull(),
-});
-export const insertTeacherSubjectSchima = createInsertSchema(teacherSubject);
+export const specialtySubject = pgTable("specialty_subject", {
+  id: serial("id").primaryKey(),
+  specialtyId: integer('specialty_id').references(() => specialties.id, {
+      onDelete: "cascade"
+  }).notNull(),
+  subjectId: integer('subject_id').references(() => subject.id, {
+      onDelete: "cascade"
+  }).notNull(),
+  year: yearEnum("year").notNull(), 
+}, (table) => [
+  unique('specialty_subject_unique').on(table.specialtyId, table.subjectId, table.year)
+]);
+export const insertspecialtySubjectSchima = createInsertSchema(specialtySubject);
 
-export const teacherSubjectGroup = pgTable("teacher_subject_group", {
-    id: serial("id").primaryKey(),
-    teacherId: text('teacher_id').references(()=> user.id).notNull(),
-    subjectId: integer('subject_id').references(()=> subject.id).notNull(),
-    groupId: integer('group_id').references(()=> studentGroup.id).notNull(),
+
+export const teacherAssignment = pgTable("teacher_assignment", {
+  id: serial("id").primaryKey(),
+  teacherId: text('teacher_id').references(() => user.id, {
+      onDelete: "set null"
+  }),
+  groupId: integer('group_id').references(() => studentGroup.id, {
+      onDelete: "cascade"
+  }).notNull(),
+  specialtySubjectId: integer('specialty_subject_id').references(() => specialtySubject.id, {
+      onDelete: "cascade"
+  }).notNull(),
+  assessment_type: assessmentTypeEnum('assessment_type').notNull(),
 });
+export const teacherAssignmentSchima = createInsertSchema(teacherAssignment)
+
+
+export const studentSubjectEvent = pgTable("student_subject_event", {
+  id: bigserial("id",{
+    mode: "number"
+  }).primaryKey(),
+  studentId: text("student_id").references(() => user.id, {
+    onDelete: "cascade"
+  }).notNull(),
+  teacherAssignmentId: integer("teacher_assignment_id").references(() => teacherAssignment.id, {
+    onDelete: "cascade"
+  }).notNull(),
+  event: EventEnum("event").notNull(),
+  eventDate: date('event_date').notNull(),
+  
+});
+export const studentSubjectSchima = createInsertSchema(studentSubjectEvent)
+
+
+export const assessmentTest = pgTable("assessment_test", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  testDate: date('test_date').notNull(),
+  replacementDate: date('replacement_date'),
+  assessmentId: integer("assessment_id").references(() => teacherAssignment.id, {
+    onDelete: "cascade"
+  }).notNull(),
+});
+export const assessmentTestSchima = createInsertSchema(assessmentTest)
+
+export const assessmentTestEvent = pgTable("assessment_test_event", {
+  id: bigserial("id",{ mode: "number" }).primaryKey(),
+  studentId: text("student_id").references(() => user.id, { onDelete: "cascade" }).notNull(),
+  assessmentTestId: integer("assessment_test_id").references(() => assessmentTest.id, { onDelete: "cascade" }).notNull(),
+  event: EventEnum("event").notNull(),
+}, 
+(table) => [  
+  unique("assessment_test_event_unique").on(table.studentId, table.assessmentTestId,)
+  ]);
+export const assessmentTestEventSchima = createInsertSchema(assessmentTestEvent)
+

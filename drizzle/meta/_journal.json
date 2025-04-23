@@ -43,6 +43,125 @@
       "when": 1742159881880,
       "tag": "0005_eager_silverclaw",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1742409161440,
+      "tag": "0006_huge_tigra",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1742429419784,
+      "tag": "0007_elite_the_hand",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1742430040930,
+      "tag": "0008_brief_leopardon",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1742597342093,
+      "tag": "0009_peaceful_the_executioner",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1742604453021,
+      "tag": "0010_silly_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1742651958906,
+      "tag": "0011_fluffy_jocasta",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1742654010603,
+      "tag": "0012_shiny_malcolm_colcord",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1742931444551,
+      "tag": "0013_sticky_santa_claus",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1742931725114,
+      "tag": "0014_secret_the_anarchist",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1742932010699,
+      "tag": "0015_true_giant_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1742937729227,
+      "tag": "0016_slimy_amphibian",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1742942301449,
+      "tag": "0017_violet_talkback",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1745154693631,
+      "tag": "0018_curved_the_initiative",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1745154881288,
+      "tag": "0019_jittery_ben_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1745270282500,
+      "tag": "0020_acoustic_gamora",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1745313245017,
+      "tag": "0021_tough_tinkerer",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1745314301799,
+      "tag": "0022_little_wolverine",
+      "breakpoints": true
     }
   ]
 }

@@ -1,18 +1,16 @@
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation'
 
 import { SpecialtieSwitcher } from "@/features/specialtie/components/specialtie-switcher";
 import { MajorSwitcher } from "@/features/major/components/major-switcher";
 import { GroupSwitcher } from '@/features/student-group/components/group-switcher';
 import { EditGroup } from '@/features/student-group/components/edit-group';
 import StudentsList from '@/features/students/components/students-list';
+import TeacherAssignList from '@/features/teacher-assignment/components/teacher-assignment-list';
+import { adminOnly } from "@/lib/admin-only";
 
 export default async function Page() {
 
-    const session = await auth.api.getSession({headers: await headers()})
-    const user = session?.user
-    if (!user) redirect('/login')                
+      await adminOnly() 
+                  
     
   return (
     <div className="flex flex-col gap-y-4">
@@ -27,6 +25,7 @@ export default async function Page() {
             
             <EditGroup />
           </div>
+          <TeacherAssignList />
           <StudentsList />
         </div>
   )

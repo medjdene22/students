@@ -32,7 +32,8 @@ interface DataTableProps<TData, TValue> {
   data: TData[],
   filterKeys: string[],
   disabled?: boolean,
-  onDelete: (rows: Row<TData>[]) => void
+  onDelete?: (rows: Row<TData>[]) => void,
+  pageSize?: number 
 }
 
 export function DataTable<TData, TValue>({
@@ -40,7 +41,8 @@ export function DataTable<TData, TValue>({
   data,
   filterKeys,
   disabled,
-  onDelete
+  onDelete,
+  pageSize
 }: DataTableProps<TData, TValue>) {
 
   const [ConfiramtionDialog, confirm] = useConfirm("Are you sure?","you are about to preform a bulk delete", 'destructive'); 
@@ -62,12 +64,21 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
+    initialState: {
+      pagination: {
+        pageSize: pageSize ?? 10,
+      },
+    },    
     state: {
       sorting,
       columnFilters,
       rowSelection,
     },
   })
+
+  const hasSelectColumn = columns.some(column => 
+    typeof column === 'object' && 'id' in column && column.id === 'select'
+  )
 
   return (
 <div>
@@ -89,7 +100,7 @@ export function DataTable<TData, TValue>({
             onClick={async () => {
                 const pk = await confirm();
                 if (pk) {
-                              onDelete(table.getFilteredSelectedRowModel().rows)
+                              onDelete?.(table.getFilteredSelectedRowModel().rows)
                 }
                 table.resetRowSelection();
 
@@ -147,10 +158,10 @@ export function DataTable<TData, TValue>({
     </div>
 
     <div className="flex items-center justify-end space-x-2 py-4 pl-3">
-        <div className="flex-1 text-sm text-muted-foreground">
+        { hasSelectColumn && <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
+        </div>}
         <Button
           variant="outline"
           size="sm"

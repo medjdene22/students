@@ -2,9 +2,9 @@
 
 import * as React from "react"
 import {
-
+  GraduationCap,
   Command,
-
+  UserRound
 } from "lucide-react"
 
 // import { NavMain } from "@/components/nav-main"
@@ -25,120 +25,16 @@ import { authClient } from "@/lib/auth-client";
 import { Role } from "@/lib/types";
 import Link from "next/link"
 import { AdminNav } from "./admin.nav"
+import { TeacherNav } from "../features/teacher-user/components/teacher-nav";
+import { StudentNav } from "@/features/student-user/components/student-nav";
 
-// const data = {
-
-//   navMain: [
-//     {
-//       title: "Playground",
-//       url: "#",
-//       icon: SquareTerminal,
-//       isActive: true,
-//       items: [
-//         {
-//           title: "History",
-//           url: "#",
-//         },
-//         {
-//           title: "Starred",
-//           url: "#",
-//         },
-//         {
-//           title: "Settings",
-//           url: "#",
-//         },
-//       ],
-//     },
-//     {
-//       title: "Models",
-//       url: "#",
-//       icon: Bot,
-//       items: [
-//         {
-//           title: "Genesis",
-//           url: "#",
-//         },
-//         {
-//           title: "Explorer",
-//           url: "#",
-//         },
-//         {
-//           title: "Quantum",
-//           url: "#",
-//         },
-//       ],
-//     },
-//     {
-//       title: "Documentation",
-//       url: "#",
-//       icon: BookOpen,
-//       items: [
-//         {
-//           title: "Introduction",
-//           url: "#",
-//         },
-//         {
-//           title: "Get Started",
-//           url: "#",
-//         },
-//         {
-//           title: "Tutorials",
-//           url: "#",
-//         },
-//         {
-//           title: "Changelog",
-//           url: "#",
-//         },
-//       ],
-//     },
-//     {
-//       title: "Settings",
-//       url: "#",
-//       icon: Settings2,
-//       items: [
-//         {
-//           title: "General",
-//           url: "#",
-//         },
-//         {
-//           title: "Team",
-//           url: "#",
-//         },
-//         {
-//           title: "Billing",
-//           url: "#",
-//         },
-//         {
-//           title: "Limits",
-//           url: "#",
-//         },
-//       ],
-//     },
-//   ],
-//   projects: [
-//     {
-//       name: "Design Engineering",
-//       url: "#",
-//       icon: Frame,
-//     },
-//     {
-//       name: "Sales & Marketing",
-//       url: "#",
-//       icon: PieChart,
-//     },
-//     {
-//       name: "Travel",
-//       url: "#",
-//       icon: Map,
-//     },
-//   ],
-// }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     const user = authClient.useSession().data?.user
     const role = user?.role
-  return (
+
+    return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
@@ -146,7 +42,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Command className="size-4" />
+                  
+                  { role === Role.ADMIN && <Command className="h-6 w-6" />}
+                  { role === Role.TEACHER && <GraduationCap className="h-6 w-6" />}
+                  { role === Role.STUDENT && <UserRound className="h-6 w-6" />}
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Student Attendence</span>
@@ -160,7 +59,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         {role===Role.ADMIN && (<AdminNav />)}
-
+        {role===Role.TEACHER && (<TeacherNav />)}
+        {role===Role.STUDENT && (<StudentNav />)}
       </SidebarContent>
       <SidebarFooter>
       </SidebarFooter>

@@ -16,3 +16,15 @@ export enum Role {
   STUDENT = "student",
   TEACHER = "teacher"
 }
+// export const EventEnum = pgEnum("event", ["absence", "absence_justificated", "participation", "absence_test", "absence_test_justificated", "absence_exam", "absence_exam_justificated"]);
+
+export enum Events {
+  ABSENCE = "absence",
+  PARTICIPATION = "participation",
+  ABSENCE_JUSTIFIED = "absence_justified",
+  TEST = "absence_test",
+  TEST_JUSTIFICATION = "absence_test_justified",
+  EXAM = "absence_exam",
+  EXAM_JUSTIFICATION = "absence_exam_justified",
+
+}

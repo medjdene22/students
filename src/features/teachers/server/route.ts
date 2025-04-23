@@ -8,13 +8,11 @@ import { count, eq, inArray } from "drizzle-orm"
 import { createTeacherSchema, editTeacherSchema } from "../schema"
 import { auth } from "@/lib/auth"
 import { z } from "zod"
+import { adminMiddleware } from "@/lib/admin-middleware"
 
 const app = new Hono<AdditionalContext>()
+    .use(adminMiddleware)
     .get("/", async (c) => {
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
         
         const teachersSelected = await db
         .select({
@@ -35,10 +33,6 @@ const app = new Hono<AdditionalContext>()
     })
 
     .get("/:id", zValidator('param', z.object({ id: z.string() })), async (c) => {
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
         
         const {id} = c.req.valid('param')
         const [teacherSelected] = await db
@@ -61,10 +55,6 @@ const app = new Hono<AdditionalContext>()
     })
 
     .post("/", zValidator('json', createTeacherSchema), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
 
         const values = c.req.valid('json')
         const userCreated = await auth.api.createUser({
@@ -94,10 +84,6 @@ const app = new Hono<AdditionalContext>()
     })
 
     .patch("/:id", zValidator('param', z.object({ id: z.string() })), zValidator('json', editTeacherSchema), async (c) => {
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
         
         const { id } = c.req.valid('param')
         const values = c.req.valid('json')
@@ -134,11 +120,7 @@ const app = new Hono<AdditionalContext>()
     })
     
     .delete("/:id", zValidator('param', z.object({ id: z.string() })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
-        
+
         const { id } = c.req.valid('param')
         await db.delete(teacherInformation).where(eq(teacherInformation.teacherId, id))
 
@@ -153,11 +135,7 @@ const app = new Hono<AdditionalContext>()
     })
 
     .post("/bulk", zValidator('json', z.object({ ids: z.array(z.string()) })), async (c) => {
-        const user = c.get("user")
-        if (!user || user.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
-        
+
         const { ids } = c.req.valid('json')
         await db
             .delete(teacherInformation)
@@ -180,11 +158,7 @@ const app = new Hono<AdditionalContext>()
     })
     
     .get("/count", async (c) => {
-        const user_ = c.get("user")
-        if (!user_ || user_.role !== Role.ADMIN) {
-            return c.json({ error: 'Unauthorized' }, 401)
-        }
-        
+
         const [result] = await db
             .select({
                 count: count(teacherInformation.id)

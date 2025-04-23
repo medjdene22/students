@@ -1,16 +1,13 @@
 import { MajorSwitcher } from "@/features/major/components/major-switcher";
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation'
 import SpecialtiesList from "@/features/specialtie/components/specialties-list";
 import { EditMajor } from "@/features/major/components/edit-major";
+import { adminOnly } from "@/lib/admin-only";
 
 
 export default async function Page() {
 
-    const session = await auth.api.getSession({headers: await headers()})
-    const user = session?.user
-    if (!user) redirect('/login')                
+      await adminOnly() 
+                   
     
   return (
     <div className="flex flex-col gap-y-4">
