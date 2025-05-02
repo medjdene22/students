@@ -11,7 +11,6 @@ import { InferResponseType } from "hono";
 import { client } from "@/lib/hono";
 import { useRouter } from "next/navigation";
 import { useTeacherSubjectId } from "../hooks/use-teacher-subject-id";
-import { useAssignmentStudentId } from "../hooks/use-assignment-student-";
 import { useTeacherAssignmentId } from "../hooks/use-teacher-assignment-id";
 
 type Student = InferResponseType<typeof client.api.teacherUser["group"][":teacherAssignmentId"]["$get"], 200>['students'][0];
@@ -126,29 +125,38 @@ export const columns: ColumnDef<Student>[] = [
     id: "actions",
     cell: ({ row }) => {
       const student = row.original;
-      const router = useRouter()
-      const teacherSubjectId = useTeacherSubjectId()
-      const teacherAssignmentId = useTeacherAssignmentId()
-      const onClick = () => {      
-        router.push(`/dashboard/subject/${teacherSubjectId}/group/${teacherAssignmentId}/student/${student.studentId}`)
-      }
+      
 
       return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onClick}>
-                <ScrollText className="mr-2 h-4 w-4" />
-                View Attendence history
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <StudentActionsCell student={student} />  
 
       );
     },
   },
 ];
+
+function StudentActionsCell({ student }: { student: Student }) {
+  const router = useRouter();
+  const teacherSubjectId = useTeacherSubjectId();
+  const teacherAssignmentId = useTeacherAssignmentId();
+  
+  const onClick = () => {      
+    router.push(`/dashboard/subject/${teacherSubjectId}/group/${teacherAssignmentId}/student/${student.studentId}`);
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={onClick}>
+          <ScrollText className="mr-2 h-4 w-4" />
+          View Attendance history
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

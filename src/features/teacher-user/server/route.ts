@@ -8,15 +8,12 @@ import {
   studentSubjectSchima,
   subject,
   teacherAssignment,
-  teacherAssignmentSchima,
   user,
 } from "@/db/schema";
-import { adminMiddleware } from "@/lib/admin-middleware";
 import { AdditionalContext } from "@/lib/session-middleware";
 import { teacherMiddleware } from "@/lib/teacher-middleware";
 import { zValidator } from "@hono/zod-validator";
-import { group } from "console";
-import { sql, eq, and, count } from "drizzle-orm";
+import { sql, eq, and } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 

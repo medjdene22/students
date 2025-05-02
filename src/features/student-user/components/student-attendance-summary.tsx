@@ -1,28 +1,31 @@
 "use client";
 
-import { useGetStudentEvents } from "../api/use-get-student-events";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useStudentSubjectId } from "../hooks/use-student-class-id";
-import { CheckCircle, AlertCircle, GraduationCap, User } from "lucide-react";
+// import { useGetStudentEvents } from "../api/use-get-student-events";
+import { Card
+  // , CardContent, CardHeader, CardTitle 
+} from "@/components/ui/card";
+// import { useStudentSubjectId } from "../hooks/use-student-class-id";
+// import { CheckCircle, AlertCircle, GraduationCap, User } from "lucide-react";
 
 export function StudentAttendanceSummary() {
-  const subjectId = Number(useStudentSubjectId());
-  const { data, isLoading } = useGetStudentEvents({
-    subjectId,
-  });
-  const { subject } = data || {};
+  // const subjectId = Number(useStudentSubjectId());
+  // const { data, isLoading } = useGetStudentEvents({
+  //   subjectId,
+  // });
+  // const { subject } = data || {};
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
-  if (!subject) {
-    return <div>No data available</div>;
-  }
+  // if (!subject) {
+  //   return <div>No data available</div>;
+  // }
 
   return (
     <Card className="border shadow-sm">
-      <CardHeader>
+      hi
+      {/* <CardHeader>
         <CardTitle className="text-2xl font-semibold">
           {subject.subjectName} - Summary
         </CardTitle>
@@ -77,7 +80,7 @@ export function StudentAttendanceSummary() {
             ))}
           </div>
         </div>
-      </CardContent>
+      </CardContent> */}
     </Card>
   );
 }

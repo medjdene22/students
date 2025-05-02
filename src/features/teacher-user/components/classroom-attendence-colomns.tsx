@@ -5,11 +5,10 @@ import { ColumnDef } from "@tanstack/react-table"
 import { InferResponseType } from "hono/client";
 import { UserMinus, UserPlus } from "lucide-react"
 import { useCreateStudentEvent } from "../api/use-create-student-event";
-import { useGetTeacher } from "../api/use-get-teacher";
-import { useTeacherAssignmentId } from "../hooks/use-teacher-assignment-id";
-import { useTeacherDay } from "../hooks/use-teacher-day";
+// import { useGetTeacher } from "../api/use-get-teacher";
+// import { useTeacherAssignmentId } from "../hooks/use-teacher-assignment-id";
+// import { useTeacherDay } from "../hooks/use-teacher-day";
 import { useDeleteStudentEvent } from "../api/use-delete-student-event";
-import { use } from "react";
 import { useTeacherSubjectId } from "../hooks/use-teacher-subject-id";
 
 
@@ -56,10 +55,11 @@ const Attendance = ({ student }: { student: StudentAttendance }) => {
         }
       })
     }
+    const isPending = isPendingCreated || isPendingDeleted
 
     return (
       <div className="flex gap-2">
-        <Button 
+        <Button disabled={isPending}
           variant={student.event === Events.PARTICIPATION ? "default" : "outline"}
           size="sm"
           className={student.event === Events.PARTICIPATION ? "bg-green-600" : "hover:bg-green-100"}
@@ -68,7 +68,7 @@ const Attendance = ({ student }: { student: StudentAttendance }) => {
           <UserPlus className="h-4 w-4 mr-1" />
           Participation
         </Button>
-        <Button 
+        <Button disabled={isPending}
           variant={student.event === Events.ABSENCE ? "default" : "outline"}
           size="sm"
           className={student.event === Events.ABSENCE ? "bg-red-600" : "hover:bg-red-100"}

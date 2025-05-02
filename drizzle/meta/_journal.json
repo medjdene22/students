@@ -162,6 +162,20 @@
       "when": 1745314301799,
       "tag": "0022_little_wolverine",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1745498113765,
+      "tag": "0023_narrow_paper_doll",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1745498158492,
+      "tag": "0024_smart_susan_delgado",
+      "breakpoints": true
     }
   ]
 }

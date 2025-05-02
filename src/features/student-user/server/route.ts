@@ -1,5 +1,7 @@
 import { db } from "@/db";
 import {
+  assessmentTest,
+  assessmentTestEvent,
   specialties,
   specialtySubject,
   studentGroup,
@@ -12,9 +14,10 @@ import {
 import { AdditionalContext } from "@/lib/session-middleware";
 import { studentMiddleware } from "@/lib/student-middleware";
 import { zValidator } from "@hono/zod-validator";
-import { sql, eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
+import { JustificationType} from "@/lib/types";
 
 const app = new Hono<AdditionalContext>()
   .use(studentMiddleware)
@@ -126,22 +129,6 @@ const app = new Hono<AdditionalContext>()
         .from(studentInformation)
         .where(eq(studentInformation.studentId, student.id));
         
-      // Get teacher assignments for this subject and group
-      const teacherAssignments = await db
-        .select({
-          id: teacherAssignment.id,
-          teacherId: teacherAssignment.teacherId,
-          teacherName: user.name,
-          assessmentType: teacherAssignment.assessment_type,
-        })
-        .from(teacherAssignment)
-        .innerJoin(user, eq(user.id, teacherAssignment.teacherId))
-        .where(
-          and(
-            eq(teacherAssignment.specialtySubjectId, subjectId),
-            eq(teacherAssignment.groupId, studentInfo.groupId!)
-          )
-        );
       
       // Get all events for this student in this subject
       const events = await db
@@ -149,67 +136,157 @@ const app = new Hono<AdditionalContext>()
           id: studentSubjectEvent.id,
           event: studentSubjectEvent.event,
           eventDate: studentSubjectEvent.eventDate,
-          teacherAssignmentId: studentSubjectEvent.teacherAssignmentId,
           assessmentType: teacherAssignment.assessment_type,
-          teacherName: user.name,
         })
-        .from(studentSubjectEvent)
-        .innerJoin(
-          teacherAssignment, 
-          eq(teacherAssignment.id, studentSubjectEvent.teacherAssignmentId)
-        )
-        .innerJoin(user, eq(user.id, teacherAssignment.teacherId))
+        .from(teacherAssignment)
         .where(
           and(
-            eq(studentSubjectEvent.studentId, student.id),
-            eq(teacherAssignment.specialtySubjectId, subjectId)
+            eq(teacherAssignment.groupId, studentInfo.groupId!),
+            eq(teacherAssignment.specialtySubjectId, subjectId),
           )
         )
-        .orderBy(studentSubjectEvent.eventDate);
+        .innerJoin( studentSubjectEvent, 
+          and(
+            eq(studentSubjectEvent.teacherAssignmentId, teacherAssignment.id),
+            eq(studentSubjectEvent.studentId, student.id)
+          )
+        ).orderBy(studentSubjectEvent.eventDate);
+
+        const TestEvent = await db
+          .select(
+            {
+            id: assessmentTestEvent.id,
+            event: assessmentTestEvent.event,
+            name: assessmentTest.name,
+            date: assessmentTest.testDate,
+            assessmentType: teacherAssignment.assessment_type,
+
+          }
+        )
+          .from(teacherAssignment)
+          .where(
+            and(
+              eq(teacherAssignment.groupId, studentInfo.groupId!),
+              eq(teacherAssignment.specialtySubjectId, subjectId),
+            )
+          )
+          .innerJoin(
+            assessmentTest,
+            eq(teacherAssignment.id, assessmentTest.assessmentId)
+          )
+          .innerJoin(
+            assessmentTestEvent,
+            and(
+              eq(assessmentTestEvent.studentId, student.id),
+              eq(assessmentTestEvent.assessmentTestId, assessmentTest.id),
+            )
+          )  
+
+      const transformedTestEvents = TestEvent.map(item => {
+        return {
+          id: item.id,
+          type: JustificationType.TEST,
+          event: item.event,
+          eventDate: item.name + ' - ' + item.date,
+          assessmentType: item.assessmentType
+        };
+      });
+      const transformedEvents = events.map(item => {
+        return {
+          id: item.id,
+          type: JustificationType.SESSION,
+          event: item.event,
+          eventDate: item.eventDate,
+          assessmentType: item.assessmentType
+        };
+      });
+      
+      const allEvents = [
+        ...transformedEvents,
+        ...transformedTestEvents
+      ];
+      return c.json({ events: allEvents });
+    }
+  )
+
+  .get("/summary/:subjectId", 
+    zValidator("param", z.object({ subjectId: z.coerce.number() })),
+    async (c) => {
+      const student = c.get("student");
+      const { subjectId } = c.req.valid("param");
+      
+      // Get subject info
+      const [subjectInfo] = await db
+        .select({
+          id: specialtySubject.id,
+          subjectName: subject.name,
+        })
+        .from(specialtySubject)
+        .innerJoin(subject, eq(subject.id, specialtySubject.subjectId))
+        .where(eq(specialtySubject.id, subjectId));
+        
+      if (!subjectInfo) {
+        return c.json({ error: "Subject not found" }, 404);
+      }
+      
+      // Get student's group
+      const [studentInfo] = await db
+        .select({
+          groupId: studentInformation.groupId,
+        })
+        .from(studentInformation)
+        .where(eq(studentInformation.studentId, student.id));
+        
+      // Get teacher assignments for this subject and group
+
+          
         
       // Get summary statistics
-      const [summary] = await db
-        .select({
-          participationNumber: sql<number>`
-            COUNT(CASE WHEN ${studentSubjectEvent.event} = 'participation' THEN 1 END)
-          `,
-          absenceNumber: sql<number>`
-            COUNT(CASE WHEN ${studentSubjectEvent.event} = 'absence' THEN 1 END)
-          `,
-          grade: sql<number>`
-            CAST(
-              2 +
-              LEAST(COUNT(CASE WHEN ${studentSubjectEvent.event} = 'participation' THEN 1 END) * 0.5, 3) -
-              LEAST(COUNT(CASE WHEN ${studentSubjectEvent.event} = 'absence' THEN 1 END) * 0.5, 2)
-              AS NUMERIC(3,1)
-            )
-          `,
-          subjectStatus: sql<string>`
-            CASE
-              WHEN COUNT(CASE WHEN ${studentSubjectEvent.event} = 'absence' THEN 1 END) >= 3 THEN 'excluded'
-              ELSE 'enrolled'
-            END
-          `,
-        })
-        .from(studentSubjectEvent)
-        .innerJoin(
-          teacherAssignment, 
-          eq(teacherAssignment.id, studentSubjectEvent.teacherAssignmentId)
-        )
-        .where(
+      const assessments = await db
+        .select(
+          {
+            teacherAssignmentId: teacherAssignment.id,
+            teacherName: user.name,
+            assessmentType: teacherAssignment.assessment_type,
+            participationNumber: sql<string>`  COUNT(CASE WHEN ${studentSubjectEvent.event} = 'participation' AND ${studentSubjectEvent.teacherAssignmentId} = ${teacherAssignment.id} THEN 1 END)`,
+            absenceNumber: sql<string>`  COUNT(CASE WHEN ${studentSubjectEvent.event} = 'absence' AND ${studentSubjectEvent.teacherAssignmentId} = ${teacherAssignment.id} THEN 1 END)`,
+            assignmentGrade: sql<string>`
+                          CAST(
+                              2 +
+                              LEAST(COUNT(CASE WHEN ${studentSubjectEvent.event} = 'participation' AND ${studentSubjectEvent.teacherAssignmentId} = ${teacherAssignment.id} THEN 1 END) * 0.5, 3) -
+                              LEAST(COUNT(CASE WHEN ${studentSubjectEvent.event} = 'absence' AND ${studentSubjectEvent.teacherAssignmentId} = ${teacherAssignment.id} THEN 1 END) * 0.5, 2)
+                              AS NUMERIC(3,1)
+                          )
+                      `,
+       
+        }
+      )
+        .from(teacherAssignment).where(
           and(
-            eq(studentSubjectEvent.studentId, student.id),
-            eq(teacherAssignment.specialtySubjectId, subjectId)
+            eq(teacherAssignment.specialtySubjectId, subjectId),
+            eq(teacherAssignment.groupId, studentInfo.groupId!)
           )
-        );
+        ).innerJoin(user, eq(user.id, teacherAssignment.teacherId))
+        .leftJoin(studentSubjectEvent, and(eq(studentSubjectEvent.studentId, student.id), eq(studentSubjectEvent.teacherAssignmentId, teacherAssignment.id)))
+        .groupBy(teacherAssignment.id, user.name, teacherAssignment.assessment_type)
         
+      const totalAbsence = assessments.reduce((total, assessment) => {
+        return total + parseInt(assessment.absenceNumber, 10);
+      }, 0);
+    
+      const subjectStatus = totalAbsence >= 3 ? 'excluded' : 'enrolled';
+
       const studentSubject = {
-        ...subjectInfo,
-        teachers: teacherAssignments,
-        ...summary
+        subject : {
+          ...subjectInfo,
+          totalAbsence,
+          subjectStatus
+        },
+        assessments
       };
-        
-      return c.json({ events, subject: studentSubject });
+
+
+      return c.json({ studentSubject});
     }
   );
 

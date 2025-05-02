@@ -4,6 +4,9 @@ import { format } from "date-fns";
 import { ArrowUpDown } from "lucide-react";
 import { client } from "@/lib/hono";
 import { InferResponseType } from "hono/client";
+import { Badge } from "@/components/ui/badge"
+// import { Events } from "@/lib/types";
+import { StudentAppealAction } from "./student-appeal-action";
 
 export type StudentEvent = InferResponseType<typeof client.api.studentUser.events[":subjectId"]["$get"], 200>['events'][0];
 
@@ -22,7 +25,7 @@ export const columns: ColumnDef<StudentEvent>[] = [
       );
     },
     cell: ({ row }) => {
-      const event = row.getValue("event") as string;
+      const event = row.original.event;
       let colorClass = "";
       let displayText = "";
 
@@ -35,7 +38,7 @@ export const columns: ColumnDef<StudentEvent>[] = [
           colorClass = "bg-red-100 text-red-800";
           displayText = "Absence";
           break;
-        case "absence_justificated":
+        case "absence_justified":
           colorClass = "bg-yellow-100 text-yellow-800";
           displayText = "Justified Absence";
           break;
@@ -71,8 +74,21 @@ export const columns: ColumnDef<StudentEvent>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue("eventDate"));
-      return <div>{format(date, "PPP")}</div>;
+      const event = row.original;
+      let eventDate = event.eventDate;
+      const eventType = event.type;
+      let extra = "";
+      if (eventType === "test") {
+       [ extra, eventDate] = eventDate.split(" - ");
+        
+      }
+      console.log(eventDate)
+      return (
+        <Badge variant="outline">
+          {extra && <p className="mr-1">{extra + " on"}  </p>}
+                {format(new Date(eventDate), 'PPP')}
+        </Badge>
+      )
     },
   },
   {
@@ -84,10 +100,17 @@ export const columns: ColumnDef<StudentEvent>[] = [
     },
   },
   {
-    accessorKey: "teacherName",
-    header: "Teacher",
-    cell: ({ row }) => {
-      return <div>{row.getValue("teacherName")}</div>;
+      id: "actions",
+      cell: ({ row }) => {
+        const studentEvent = row.original;
+  
+        return (
+          // <div className="flex justify-end">hi</div>
+          <StudentAppealAction
+            EventToAppeal={studentEvent}
+          />
+        );
+      },
     },
-  },
+
 ];

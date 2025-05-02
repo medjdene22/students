@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTeacherAssignmentId } from "../hooks/use-teacher-assignment-id"
-import { useCreateStudentEvent } from "../api/use-create-student-event"
+// import { useCreateStudentEvent } from "../api/use-create-student-event"
 import { format } from "date-fns"
 import { DataTable } from "@/components/data-table"
 import { columns } from './classroom-attendence-colomns'
@@ -39,7 +39,7 @@ export function ClassroomAttendance() {
   //   setAttendance(initialAttendance)
   // }
   
-  const date = format(new Date(), "dd-MM-yyyy")
+  // const date = format(new Date(), "dd-MM-yyyy")
   
   // const handleStatusChange = (studentId: string, status: Events | "default") => {
   //   setAttendance(prev => 
@@ -86,7 +86,7 @@ export function ClassroomAttendance() {
       <CardContent>
         <div className="mb-4 flex justify-between items-center">
           <p className="text-muted-foreground">
-            Mark students as participating or absent for today's class.
+            Mark students as participating or absent for today session.
           </p>
           {/* <Button 
             onClick={handleSaveAttendance} 

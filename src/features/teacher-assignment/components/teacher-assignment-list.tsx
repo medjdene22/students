@@ -24,7 +24,7 @@ export default function TeacherAssignList() {
 
                 <CardContent className='flex-1 overflow-auto'>
                     <DataTable disabled={isDisabled} columns={columns} data={assignments ?? []} filterKeys={["subjectName"]} onDelete={
-                                            (rows) => {
+                                            () => {
                                                 
                                             }
                     } />

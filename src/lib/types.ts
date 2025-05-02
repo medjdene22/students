@@ -28,3 +28,29 @@ export enum Events {
   EXAM_JUSTIFICATION = "absence_exam_justified",
 
 }
+
+export enum JustificationStatus {
+    PENDING = "pending",
+    APPROVED = "approved",
+    REJECTED = "rejected",
+}
+export enum JustificationType {
+    SESSION = "session",
+    TEST = "test",
+}
+
+export enum JustificationEvent {
+    ABSENCE = "absence",
+    ABSENCE_JUSTIFIED = "absence-justified",
+}
+export interface Justification {
+    type: JustificationType;
+    eventId: number;
+    event: JustificationEvent;
+    eventDate: string;
+    justificationId: number;
+    assessment: string;
+    status: JustificationStatus;
+    submitDate: string;
+    verificationDate: string | null;
+  }

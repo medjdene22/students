@@ -2,10 +2,10 @@ import { Hono } from "hono"
 import { zValidator } from "@hono/zod-validator"
 
 import { db } from "@/db"
-import { insertspecialtySubjectSchima, insertSubjectSchima, specialties, studentGroup, subject, specialtySubject } from "@/db/schema"
+import { insertspecialtySubjectSchima, insertSubjectSchima, specialties, subject, specialtySubject } from "@/db/schema"
 import { AdditionalContext } from "@/lib/session-middleware"
 import { z } from "zod"
-import { and, eq, inArray } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
 import { adminMiddleware } from "@/lib/admin-middleware"
 
 
@@ -70,9 +70,8 @@ const app = new Hono<AdditionalContext>()
         return c.json({ subjectDeleted })
     })
 
-    .post("/seed", async (c) => {
+    .get("/seed/pleas", async (c) => {
         
-        const name = 'Business Intelligence'
         const subjectsinserted = await db.insert(subject).values(
             [
                 {

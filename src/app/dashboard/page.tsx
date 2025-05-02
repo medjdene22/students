@@ -7,6 +7,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
+import { StudentProfile } from "@/features/student-user/components/student-profile";
 
 export default async function Page() {
 
@@ -15,8 +16,16 @@ export default async function Page() {
   if (!user) redirect('/login')
 
   // const { data: teachersCount, isLoading: isLoadingTeachersCount } = useGetTeachersCount();
+  if(user.role === "student") {
+    return (
+    <div>
+        <StudentProfile />
+      
   
-  return (
+    </div>
+    ) 
+  }
+return (
 
     <div>
       DashBoard

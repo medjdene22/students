@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowUpDown } from "lucide-react"
 import { client } from "@/lib/hono"
 import { InferResponseType } from "hono"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useGetTeachers } from "@/features/teachers/api/use-get-teachers"
 
 // This type is used to define the shape of our data.

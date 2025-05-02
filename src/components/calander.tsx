@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Calendar } from "./ui/calendar"
-import { useParams, usePathname, useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { format, parse, startOfMonth } from "date-fns"
 import { useTeacherAssignmentId } from "@/features/teacher-user/hooks/use-teacher-assignment-id"
 import { useTeacherSubjectId } from "@/features/teacher-user/hooks/use-teacher-subject-id"
@@ -14,7 +14,7 @@ export function CalendarNav() {
     const [displayMonth, setDisplayMonth] = useState<Date | undefined>()
     const teacherSubjectId = Number(useTeacherSubjectId())
     const teacherAssignmentId = Number(useTeacherAssignmentId())
-    const { data: assignment, isLoading } = useGetTeacherAssignment({id: teacherAssignmentId})
+    const { data: assignment } = useGetTeacherAssignment({id: teacherAssignmentId})
     
     useEffect(() => {        
         

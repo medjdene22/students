@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum, serial, integer, unique, bigserial, date } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, pgEnum, serial, integer, unique, bigserial, date, customType } from "drizzle-orm/pg-core";
 import { createInsertSchema} from "drizzle-zod"
 
 export const roleEnum = pgEnum("role", ["admin", "user", "student", "teacher"]);
@@ -8,7 +8,9 @@ export const yearEnum = pgEnum("year", ["first", "second", "third", "fourth", "f
 export const teacherGradeEnum = pgEnum("teacher_grade", ["mcb", "mca", "professor", "substitute"]);
 
 export const assessmentTypeEnum = pgEnum("assessment_type", ["exam", "td", "tp"]);
-export const EventEnum = pgEnum("event", ["absence", "absence_justified", "participation", "absence_test", "absence_test_justificated", "absence_exam", "absence_exam_justificated"]);
+export const EventEnum = pgEnum("event", ["absence", "absence_justified", "participation", "absence_test", "absence_test_justified", "absence_exam", "absence_exam_justified"]);
+export const statusEnum = pgEnum("status", ["pending", "approved", "rejected"]);
+export const justificationTypeEnum = pgEnum("justification_type", ["test", "session"]);
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -188,3 +190,38 @@ export const assessmentTestEvent = pgTable("assessment_test_event", {
   ]);
 export const assessmentTestEventSchima = createInsertSchema(assessmentTestEvent)
 
+export const bytea = customType<{
+  data: Buffer;
+  driverData: string | Buffer;
+}>({
+  dataType() {
+    return 'bytea';
+  },
+  toDriver(value: Buffer): Buffer {
+    return value;
+  },
+  fromDriver(value: string | Buffer): Buffer {
+    if (Buffer.isBuffer(value)) {
+      return value;
+    }
+    return Buffer.from(value, 'hex');
+  },
+});
+
+
+export const absenceJustification = pgTable("absence_justification", {
+  id: serial("id").primaryKey(),
+  subjectEventId: integer("subject_event_id").references(() => studentSubjectEvent.id, { onDelete: "cascade" }),
+  testEventId: integer("test_event_id").references(() => assessmentTestEvent.id, { onDelete: "cascade" }),
+  justificationType: justificationTypeEnum("justification_type").notNull(),
+  notes: text("notes"),
+  submitDate: date("submit_date").notNull(),
+  //images or pdf
+  fileData: bytea('file_data').notNull(),
+  fileType: text('file_type').notNull(),
+  verificationDate: date("verification_date"),
+  status: statusEnum("status").default("pending").notNull(),
+  reason: text("reason"),
+
+});
+export const absenceJustificationSchima = createInsertSchema(absenceJustification);

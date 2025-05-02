@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { specialtySubject, studentGroup, subject, teacherAssignment, teacherAssignmentSchima, user, assessmentTest, assessmentTestSchima, studentInformation, studentSubjectEvent, assessmentTestEvent, assessmentTestEventSchima } from "@/db/schema";
+import {  teacherAssignment, user, assessmentTest, assessmentTestSchima, studentInformation, studentSubjectEvent, assessmentTestEvent, assessmentTestEventSchima } from "@/db/schema";
 import { AdditionalContext } from "@/lib/session-middleware";
 import { teacherMiddleware } from "@/lib/teacher-middleware";
 import { Events } from "@/lib/types";
@@ -157,6 +157,7 @@ const app = new Hono<AdditionalContext>()
                 .where(
                     and(
                         eq(assessmentTest.id, testId),
+                        eq(teacherAssignment.teacherId, teacher.id)
                     ),
                 );
             if (!test) return c.json({ error: "Unauthorized" }, 401);
@@ -299,6 +300,7 @@ const app = new Hono<AdditionalContext>()
             .where(
                 and(
                     eq(assessmentTest.id, testId),
+                    eq(teacherAssignment.teacherId, teacher.id)
                 ),
             );
             if (!test) return c.json({ error: "Unauthorized" }, 401);

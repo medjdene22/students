@@ -24,7 +24,7 @@ interface TestCreateDialogProps {
 
 export function TestCreateDialog({ 
   teacherAssignmentId, 
-  isDialogOpen,
+  // isDialogOpen,
   setIsDialogOpen
 }: TestCreateDialogProps) {
   const form = useForm<z.infer<typeof testSchema>>({

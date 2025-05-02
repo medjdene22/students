@@ -20,9 +20,9 @@ export const useGetStudentEvents = ({
           throw new Error("Failed to fetch student events");
         }
 
-        const { events, subject } = await response.json();
+        const { events } = await response.json();
 
-        return { events, subject };
+        return { events };
       },
       enabled: !!subjectId,
     });

@@ -1,6 +1,5 @@
 "use client"
 
-import React from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,10 +8,9 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button'
-import { CalendarX2, ClipboardCheck, MoreHorizontal, Stethoscope } from 'lucide-react'
+import { CalendarX2, ClipboardCheck, MoreHorizontal } from 'lucide-react'
 import { useCreateTestEvent } from '../api/use-create-test-event'
 import { useDeleteTestEvent } from '../api/use-delete-test-event'
-import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useTeacherAssignmentId } from '@/features/teacher-user/hooks/use-teacher-assignment-id'
 import { useTestId } from '../hooks/use-test-id'

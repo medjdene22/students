@@ -1,6 +1,5 @@
 'use client'
 
-import React, { use } from "react";
 import { useGetTeacherStudents } from "../api/use-get-teacher-students";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./student-list-columns";

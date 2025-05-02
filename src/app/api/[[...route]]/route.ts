@@ -15,6 +15,7 @@ import teacherAssignment from '@/features/teacher-assignment/server/route';
 import teacherUser from '@/features/teacher-user/server/route';
 import studentUser from '@/features/student-user/server/route';
 import test from '@/features/test/server/route';
+import justification from '@/features/justification/server/route';
 
 const app = new Hono().basePath('/api')
 
@@ -34,42 +35,43 @@ const routes = app
     .route("/teacherUser", teacherUser)
     .route("/studentUser", studentUser)
     .route("/test", test)
+    .route("/justification", justification)
 
-routes.get('/users', async (c) => {
-    const users = await auth.api.listUsers({headers: c.req.raw.headers, query: {}});
-        // {
-        //     headers: c.req.raw.headers,
-        //     body: {
-        //         email: 'test3@imad.ma',
-        //         name: 'test3',
-        //         password: '123456',
-        //         role: 'student',
-        //         data: {
-        //             username: 'test3',
-        //         }
-        //     }
-        // }
+// routes.get('/users', async (c) => {
+//     const users = await auth.api.listUsers({headers: c.req.raw.headers, query: {}});
+//         // {
+//         //     headers: c.req.raw.headers,
+//         //     body: {
+//         //         email: 'test3@imad.ma',
+//         //         name: 'test3',
+//         //         password: '123456',
+//         //         role: 'student',
+//         //         data: {
+//         //             username: 'test3',
+//         //         }
+//         //     }
+//         // }
     
-    return c.json({users})
-})
-// routes.get('/create_user', async (c) => {
-//     const user = await auth.api.signUpEmail(
-        
-//         {
-//             headers: c.req.raw.headers,
-//             body: {
-//                 email: 'admin@admin.com',
-//                 name: 'admin',
-//                 password: 'imadimad',
-//                 role: 'student',
-//                 data: {
-//                     username: 'admin',
-//                 }
-//             }
-//         })
-    
-//     return c.json({user})
+//     return c.json({users})
 // })
+routes.get('/create_user', async (c) => {
+    const user = await auth.api.signUpEmail(
+        
+        {
+            headers: c.req.raw.headers,
+            body: {
+                email: 'admin@admin.com',
+                name: 'admin',
+                password: 'imadimad',
+                role: 'student',
+                data: {
+                    username: 'admin',
+                }
+            }
+        })
+    
+    return c.json({user})
+})
     
 export const GET = handle(app)
 export const POST = handle(app)

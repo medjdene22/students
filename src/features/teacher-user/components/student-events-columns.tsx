@@ -81,19 +81,27 @@ export const columns: ColumnDef<StudentEvent>[] = [
     id: "actions",
     cell: ({ row }) => {
       const event = row.original;
-      const teacherSubjectId = useTeacherSubjectId()
-      const { mutate, isPending } = useDeleteStudentEvent({ teacherSubjectId });
-
+      
       return (
-        <Button
-          variant="ghost"
-          size="icon"
-          disabled={isPending}
-          onClick={() => mutate({ param: { id: event.id.toString() } })}
-        >
-          <Trash2 className="h-4 w-4 text-red-500" />
-        </Button>
+        <ActionsCell event={event} />
       );
     },
   },
 ];
+
+
+function ActionsCell({ event }: {event: StudentEvent}) {
+  const teacherSubjectId = useTeacherSubjectId();
+  const { mutate, isPending } = useDeleteStudentEvent({ teacherSubjectId });
+  
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      disabled={isPending}
+      onClick={() => mutate({ param: { id: event.id.toString() } })}
+    >
+      <Trash2 className="h-4 w-4 text-red-500" />
+    </Button>
+  );
+}
