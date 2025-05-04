@@ -40,5 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# database
-/.src/db/index.ts
+
+bun.lockb
+# Ignore specific file in db directory
+/src/db/index.ts

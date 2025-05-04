@@ -70,8 +70,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             <SidebarMenu className="group-data-[collapsible=icon]:border-none">
 
-              <SidebarMenuItem className={cn("group-data-[collapsible=icon]:hidden  font-medium ", isactive && "bg-black rounded-md text-white font-semibold")}>
-                  <SidebarMenuButton asChild>
+              <SidebarMenuItem >
+                  <SidebarMenuButton asChild className={cn("  font-medium ", isactive && "bg-black rounded-md text-white font-semibold")}>
                       <Link href={fullHerf} className="flex items-center gap-2.5 p-2.5 ">
                               <Send className="size-5 " />
                               Justifications

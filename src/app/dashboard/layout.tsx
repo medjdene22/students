@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <SidebarProvider className="min-h-screen ">
       <AppSidebar />
-      <SidebarInset className="mx-auto  h-full w-full">
+      <SidebarInset className="mx-auto  h-full w-full bg-slate-200 ">
           <Header />
           <main className="h-full py-4 px-6 flex flex-col"> 
               {children}

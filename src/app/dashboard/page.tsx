@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { StudentProfile } from "@/features/student-user/components/student-profile";
+import { TeacherProfile } from "@/features/teacher-user/components/teacher-profile";
 
 export default async function Page() {
 
@@ -20,11 +21,15 @@ export default async function Page() {
     return (
     <div>
         <StudentProfile />
-      
-  
     </div>
     ) 
-  }
+  }else if(user.role === "teacher") {
+    return (
+    <div>
+        <TeacherProfile />
+    </div>
+    )
+  }  
 return (
 
     <div>

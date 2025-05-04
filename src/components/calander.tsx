@@ -14,7 +14,7 @@ export function CalendarNav() {
     const [displayMonth, setDisplayMonth] = useState<Date | undefined>()
     const teacherSubjectId = Number(useTeacherSubjectId())
     const teacherAssignmentId = Number(useTeacherAssignmentId())
-    const { data: assignment } = useGetTeacherAssignment({id: teacherAssignmentId})
+    const { data: assignment, isLoading  } = useGetTeacherAssignment({id: teacherAssignmentId})
     
     useEffect(() => {        
         
@@ -69,7 +69,7 @@ export function CalendarNav() {
     //     birthday: 'text-green-700 font-bold'
     // };
 
-    if (assignment?.assignment=="exam") {
+    if (assignment?.assignment=="exam" || isLoading) {
         return (
             <div className="">
                 

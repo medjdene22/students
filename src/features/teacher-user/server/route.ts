@@ -24,22 +24,24 @@ const app = new Hono<AdditionalContext>()
     const teacher = c.get("teacher");
     return c.json({ teacher });
   })
-  .get(  "subject/:id",
-    zValidator("param", z.object({ id: z.coerce.number() })),
+  .get(  "/subject/:specialtySubjectId",
+    zValidator("param", z.object({ specialtySubjectId: z.coerce.number() })),
     async (c) => {
-      const teacher = c.get("teacher");
-      const { id } = c.req.valid("param");
-      const [assignment] = await db
-        .select()
-        .from(teacherAssignment)
+      const { specialtySubjectId } = c.req.valid("param");
+
+      const [specialtysubject] = await db
+        .select({
+          subjectName: subject.name,
+          specialtySubjectId: specialtySubject.id,
+          specialtyName: specialties.name,
+          year: specialtySubject.year,
+        })
+        .from(specialtySubject).innerJoin(subject, eq(subject.id, specialtySubject.subjectId)).innerJoin(specialties, eq(specialties.id, specialtySubject.specialtyId))
         .where(
-          and(
-            eq(teacherAssignment.teacherId, teacher.id),
-            eq(teacherAssignment.specialtySubjectId, id),
-          ),
+          eq(specialtySubject.id, specialtySubjectId),
         );
 
-      return c.json({ assignment });
+      return c.json({ specialtysubject });
     },
   )
 
@@ -91,7 +93,7 @@ const app = new Hono<AdditionalContext>()
     },
   )
 
-  .get("groupinfo/:teacherAssignmentId",
+  .get("/groupinfo/:teacherAssignmentId",
     zValidator("param", z.object({ teacherAssignmentId: z.coerce.number() })),
     async (c) => {
       const teacher = c.get("teacher");
@@ -110,7 +112,6 @@ const app = new Hono<AdditionalContext>()
             eq(teacherAssignment.id, teacherAssignmentId),
           ),
         )
-        console.log(assignment)
       return c.json({assignment})
     }
   )
