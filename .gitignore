@@ -43,4 +43,4 @@ next-env.d.ts
 
 bun.lockb
 # Ignore specific file in db directory
-/src/db/index.ts
+# /src/db/index.ts
