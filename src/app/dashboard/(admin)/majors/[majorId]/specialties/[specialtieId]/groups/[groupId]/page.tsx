@@ -5,11 +5,12 @@ import { GroupSwitcher } from '@/features/student-group/components/group-switche
 import { EditGroup } from '@/features/student-group/components/edit-group';
 import StudentsList from '@/features/students/components/students-list';
 import TeacherAssignList from '@/features/teacher-assignment/components/teacher-assignment-list';
-import { adminOnly } from "@/lib/admin-only";
+import { RoleOnly } from "@/lib/role-only";
+import { Role } from "@/lib/types";
 
 export default async function Page() {
 
-      await adminOnly() 
+      await RoleOnly({role: Role.ADMIN})
                   
     
   return (

@@ -1,20 +1,20 @@
 "use client"
 
-import * as React from "react"
 import {
   GraduationCap,
   Command,
   UserRound
 } from "lucide-react"
-
-// import { NavMain } from "@/components/nav-main"
-// import { NavProjects } from "@/components/nav-projects"
-// import { NavUser } from "@/components/nav-user"
+import { usePathname } from "next/navigation";
+import { Send} from 'lucide-react';
+import { cn } from "@/lib/utils";
 
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -33,6 +33,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     const user = authClient.useSession().data?.user
     const role = user?.role
+
+    const pathname = usePathname();
+    const fullHerf = `/dashboard/justifications`;
+    const isactive = (pathname+'') === fullHerf
 
     return (
     <Sidebar collapsible="icon" {...props}>
@@ -61,6 +65,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {role===Role.ADMIN && (<AdminNav />)}
         {role===Role.TEACHER && (<TeacherNav />)}
         {role===Role.STUDENT && (<StudentNav />)}
+
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu className="group-data-[collapsible=icon]:border-none">
+
+              <SidebarMenuItem className={cn("group-data-[collapsible=icon]:hidden  font-medium ", isactive && "bg-black rounded-md text-white font-semibold")}>
+                  <SidebarMenuButton asChild>
+                      <Link href={fullHerf} className="flex items-center gap-2.5 p-2.5 ">
+                              <Send className="size-5 " />
+                              Justifications
+                          
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
       </SidebarFooter>

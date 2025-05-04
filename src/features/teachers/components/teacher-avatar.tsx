@@ -11,7 +11,7 @@ export enum Grade {
 }
 
 interface TeacherAvatarProps {
-    name: string;
+    name?: string;
     grade?: string;
     classname?: string;
 }

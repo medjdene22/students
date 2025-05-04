@@ -3,12 +3,13 @@ import { SpecialtieSwitcher } from "@/features/specialtie/components/specialtie-
 import { EditSpecialtie } from "@/features/specialtie/components/edit-specialtie";
 import GroupList from "@/features/student-group/components/group-list";
 import SpecialtySubjectsList from "@/features/specialtie/components/subjects-list";
-import { adminOnly } from "@/lib/admin-only";
+import { RoleOnly } from "@/lib/role-only";
+import { Role } from "@/lib/types";
 
 
 export default async function Page() {
 
-      await adminOnly() 
+      await RoleOnly({role: Role.ADMIN})
                     
     
   return (

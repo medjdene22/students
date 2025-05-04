@@ -54,3 +54,9 @@ export interface Justification {
     submitDate: string;
     verificationDate: string | null;
   }
+
+
+
+export const verifySchema = z.object({
+  reason: z.string().optional(),
+});  

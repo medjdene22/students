@@ -1,17 +1,18 @@
 
 
 import { db } from "@/db";
-import { specialtySubject, subject, teacherAssignment, assessmentTest, studentSubjectEvent, assessmentTestEvent, absenceJustification } from "@/db/schema";
+import { specialtySubject, subject, teacherAssignment, assessmentTest, studentSubjectEvent, assessmentTestEvent, absenceJustification, user } from "@/db/schema";
 import { AdditionalContext } from "@/lib/session-middleware";
 import { studentMiddleware } from "@/lib/student-middleware";
-// import { teacherMiddleware } from "@/lib/teacher-middleware";
+ import { teacherMiddleware } from "@/lib/teacher-middleware";
 // import { Events } from "@/lib/types";
 import { zValidator } from "@hono/zod-validator";
-import {  eq, and, or } from "drizzle-orm";
+import {  eq, and, or, ne } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { createJustificationSchima } from "../schema";
-import { JustificationType, JustificationStatus, JustificationEvent, Justification } from "@/lib/types";
+import { JustificationType, JustificationStatus, JustificationEvent, Justification, verifySchema, Events } from "@/lib/types";
+import { adminMiddleware } from "@/lib/admin-middleware";
 
 
 
@@ -113,12 +114,7 @@ const app = new Hono<AdditionalContext>()
         const { justificationId } = c.req.valid('param');
 
         //check if absence exists and owner is student
-        const [justification] = await db
-            .select()
-            .from(absenceJustification)
-            .where(
-                    eq(absenceJustification.id, justificationId)
-            );
+        const justification = await getJustification(justificationId);
 
         if (!justification || !justification.testEventId && !justification.subjectEventId) return c.json({ error: "Justification not found" }, 404);
 
@@ -360,7 +356,7 @@ const app = new Hono<AdditionalContext>()
                 
                 return c.json({ justification });
             }   
-        })
+    })
 
     .patch("/event/:type/:eventId/:justificationId", studentMiddleware, 
         zValidator('param', z.object({ eventId: z.coerce.number(), justificationId: z.coerce.number(), type: z.nativeEnum(JustificationType) })),
@@ -422,7 +418,7 @@ const app = new Hono<AdditionalContext>()
             ).returning();
             
             return c.json({ justification });
-        }) 
+    }) 
 
     .delete("/:justificationId", studentMiddleware, 
         zValidator('param', z.object({justificationId: z.coerce.number() })),
@@ -453,8 +449,418 @@ const app = new Hono<AdditionalContext>()
             
             
             return c.json({ justification });
+    })
+
+
+
+    .get("/verify/teacher", teacherMiddleware, zValidator('query', z.object({ status: z.nativeEnum(JustificationStatus) })),
+        async (c) => {
+            const { status } = c.req.valid('query');
+            const teacher = c.get("teacher");
+
+            const sessionJustifications = await db
+                .select({
+                    studentNmae: user.name,
+
+                    eventId: studentSubjectEvent.id,
+                    subjectName: subject.name,
+                    event: studentSubjectEvent.event,
+                    eventDate: studentSubjectEvent.eventDate,
+                    assessmentType: teacherAssignment.assessment_type,
+
+                    justificationId: absenceJustification.id,
+                    submitDate: absenceJustification.submitDate,
+                    justificationStatus: absenceJustification.status,
+
+                })
+                .from(absenceJustification)
+                .innerJoin( studentSubjectEvent, eq(studentSubjectEvent.id, absenceJustification.subjectEventId))
+                .innerJoin(user, eq(user.id, studentSubjectEvent.studentId))
+                .innerJoin( teacherAssignment, eq(teacherAssignment.id, studentSubjectEvent.teacherAssignmentId))
+                .innerJoin( specialtySubject, eq(specialtySubject.id, teacherAssignment.specialtySubjectId))
+                .innerJoin( subject, eq(subject.id, specialtySubject.subjectId))
+                .where(
+                    and(
+                        ne(teacherAssignment.assessment_type, 'exam'),
+                        eq(teacherAssignment.teacherId, teacher.id),
+                        eq(absenceJustification.justificationType, 'session'),
+                        eq(absenceJustification.status, status),
+                        
+                    )
+                )
+
+            const testJustifications = await db
+                .select({
+                    studentNmae: user.name,
+
+                    eventId: assessmentTestEvent.id,
+                    subjectName: subject.name,
+                    event: assessmentTestEvent.event,
+                    eventDate: assessmentTest.testDate,
+                    testName: assessmentTest.name,
+                    assessmentType: teacherAssignment.assessment_type,
+
+                    justificationId: absenceJustification.id,
+                    submitDate: absenceJustification.submitDate,
+                })
+                .from(absenceJustification).innerJoin( assessmentTestEvent, eq(assessmentTestEvent.id, absenceJustification.testEventId),
+                ).innerJoin( user, eq(user.id, assessmentTestEvent.studentId)
+                ).innerJoin( assessmentTest, eq(assessmentTest.id, assessmentTestEvent.assessmentTestId),
+                ).innerJoin( teacherAssignment, eq(teacherAssignment.id, assessmentTest.assessmentId),
+                ).innerJoin( specialtySubject, eq(specialtySubject.id, teacherAssignment.specialtySubjectId),
+                ).innerJoin( subject, eq(subject.id, specialtySubject.subjectId))
+                .where(
+                    and(
+                        ne(teacherAssignment.assessment_type, 'exam'),
+                        eq(teacherAssignment.teacherId, teacher.id),
+                        eq(absenceJustification.justificationType, 'test'),
+                        eq(absenceJustification.status, status) 
+                    )
+                )    
+
+
+                const transformedSessionJustification = sessionJustifications.map(item => {
+                    return {
+                        studentName: item.studentNmae,
+
+                        type: JustificationType.SESSION,
+                        eventId: item.eventId,
+                        event: item.event as JustificationEvent,
+                        eventDate: item.eventDate,
+                        assessment: item.subjectName+" - "+item.assessmentType,
+
+                        justificationId: item.justificationId,
+                        submitDate: item.submitDate,
+                    };
+                });
+                const transformedTestJustification = testJustifications.map(item => {
+                    return {
+                        studentName: item.studentNmae,
+
+                        type: JustificationType.TEST,
+                        eventId: item.eventId,
+                        eventDate: item.eventDate,
+                        event: item.event as JustificationEvent,
+                        assessment: item.subjectName+ " - " + item.testName,
+                        
+
+                        justificationId: item.justificationId,
+                        submitDate: item.submitDate,
+                    };
+                });
+
+                const justifications  = [...transformedSessionJustification, ...transformedTestJustification];
+
+                return c.json({ justifications });
+
+
         })
+
+    .get("/verify/teacher/:justificationId", teacherMiddleware, zValidator('param', z.object({ justificationId: z.coerce.number() })),
+        async (c) => {
+            const { justificationId } = c.req.valid('param');
+            const teacher = c.get("teacher");
+
+            const justification = await getJustification(justificationId);
+
+            if (!justification || !justification.testEventId && !justification.subjectEventId) return c.json({ error: "Justification not found" }, 404);
+
+            const base64File = justification?.fileData.toString('base64'); 
+
+            if (justification.justificationType === 'session') {
+                const [subjectEvent] = await db.select({
+                    studentname: user.name,
+                    studentEmail: user.email,
+
+                    subjectName: subject.name,
+                    assessmentType: teacherAssignment.assessment_type,
+                    eventDate: studentSubjectEvent.eventDate,
+                })
+                .from(studentSubjectEvent).innerJoin( teacherAssignment, eq(teacherAssignment.id, studentSubjectEvent.teacherAssignmentId))
+                .where(
+                    and(
+                        eq(teacherAssignment.teacherId, teacher.id),
+                        eq(studentSubjectEvent.id, justification.subjectEventId!)
+                    )
+                ).innerJoin(user, eq(user.id, studentSubjectEvent.studentId))
+                .innerJoin( specialtySubject, eq(specialtySubject.id, teacherAssignment.specialtySubjectId))
+                .innerJoin( subject, eq(subject.id, specialtySubject.subjectId))
+
+                if (!subjectEvent) return c.json({ error: "Subject event not found" }, 404);
+                return c.json({ subjectEvent, justification: { ...justification, fileData: base64File } });
+            } else {
+                const [subjectEvents] = await db.select({
+                    studentname: user.name,
+                    studentEmail: user.email,
+
+
+                    subjectName: subject.name,
+                    assessmentType: teacherAssignment.assessment_type,
+                    eventDate: assessmentTest.testDate,
+                    testName: assessmentTest.name,
+                })
+                .from(assessmentTestEvent).innerJoin( assessmentTest, eq(assessmentTest.id, assessmentTestEvent.assessmentTestId))
+                .innerJoin( teacherAssignment, eq(teacherAssignment.id, assessmentTest.assessmentId))
+                .where(
+                    and(
+                        eq(teacherAssignment.teacherId, teacher.id),
+                        eq(assessmentTestEvent.id, justification.testEventId!)
+                    )
+                )
+                .innerJoin( user, eq(user.id, assessmentTestEvent.studentId))
+                .innerJoin( specialtySubject, eq(specialtySubject.id, teacherAssignment.specialtySubjectId))
+                .innerJoin( subject, eq(subject.id, specialtySubject.subjectId))
+
+                if (!subjectEvents) return c.json({ error: "Subject event not found" }, 404);
+
+                const subjectEvent = {
+                    studentname: subjectEvents.studentname,
+                    studentEmail: subjectEvents.studentEmail,
+
+                    subjectName: subjectEvents.subjectName,
+                    assessmentType: subjectEvents.assessmentType,
+                    eventDate: subjectEvents.testName + ' - ' + subjectEvents.eventDate
+                }
+                return c.json({ subjectEvent, justification: { ...justification, fileData: base64File } });
+            }
+        })     
+        
+    .post("/verify/teacher/:justificationId", teacherMiddleware, 
+        zValidator('param', z.object({ justificationId: z.coerce.number() })),
+        zValidator('json', verifySchema.extend({ status: z.nativeEnum(JustificationStatus) })),
+        async (c) => {
+            const { justificationId } = c.req.valid('param');
+            const teacher = c.get("teacher");
+            const { reason, status } = c.req.valid('json');
+
+            const justification = await getJustification(justificationId);
+            if (!justification || !justification.testEventId && !justification.subjectEventId) return c.json({ error: "Justification not found" }, 404);
+            if(justification.justificationType === 'session') {
+                
+                const [subjectEvent] = await db.select({
+                    id: studentSubjectEvent.id,
+                })
+                .from(studentSubjectEvent).innerJoin( teacherAssignment, eq(teacherAssignment.id, studentSubjectEvent.teacherAssignmentId))
+                .where(
+                    and(
+                        eq(teacherAssignment.teacherId, teacher.id),
+                        eq(studentSubjectEvent.id, justification.subjectEventId!)
+                    )
+                )
+                if (!subjectEvent) return c.json({ error: "Subject event not found" }, 404);
+            } else {
+
+                const testEvent = await db.select({
+                    id: assessmentTestEvent.id,
+                })
+                .from(assessmentTestEvent).innerJoin( assessmentTest, eq(assessmentTest.id, assessmentTestEvent.assessmentTestId))
+                .innerJoin( teacherAssignment, eq(teacherAssignment.id, assessmentTest.assessmentId))
+                .where(
+                    and(
+                        eq(teacherAssignment.teacherId, teacher.id),
+                        eq(assessmentTestEvent.id, justification.testEventId!)
+                    )
+                )
+                if (!testEvent) return c.json({ error: "Test event not found" }, 404);
+            }
+            
+            const updatedJustification = await updateJustification({justificationId: justification.id, reason, status});
+            
+
+            return c.json({ justification: updatedJustification });
+
+        })  
+
+    .get("/verify/admin", adminMiddleware, zValidator('query', z.object({ status: z.nativeEnum(JustificationStatus) })),
+    async (c) => {
+        const { status } = c.req.valid('query');
+       
+
+        const testJustifications = await db
+            .select({
+                studentNmae: user.name,
+
+                eventId: assessmentTestEvent.id,
+                subjectName: subject.name,
+                event: assessmentTestEvent.event,
+                eventDate: assessmentTest.testDate,
+                testName: assessmentTest.name,
+                assessmentType: teacherAssignment.assessment_type,
+
+                justificationId: absenceJustification.id,
+                submitDate: absenceJustification.submitDate,
+            })
+            .from(absenceJustification).innerJoin( assessmentTestEvent, eq(assessmentTestEvent.id, absenceJustification.testEventId),
+            ).innerJoin( user, eq(user.id, assessmentTestEvent.studentId)
+            ).innerJoin( assessmentTest, eq(assessmentTest.id, assessmentTestEvent.assessmentTestId),
+            ).innerJoin( teacherAssignment, eq(teacherAssignment.id, assessmentTest.assessmentId),
+            ).innerJoin( specialtySubject, eq(specialtySubject.id, teacherAssignment.specialtySubjectId),
+            ).innerJoin( subject, eq(subject.id, specialtySubject.subjectId))
+            .where(
+                and(
+                    eq(teacherAssignment.assessment_type, 'exam'),
+                    eq(absenceJustification.justificationType, 'test'),
+                    eq(absenceJustification.status, status) 
+                )
+            )
+
+            const transformedTestJustification = testJustifications.map(item => {
+                return {
+                    studentName: item.studentNmae,
+
+                    type: JustificationType.TEST,
+                    eventId: item.eventId,
+                    eventDate: item.eventDate,
+                    event: item.event as JustificationEvent,
+                    assessment: item.subjectName+ " - " + item.testName,
+                    
+
+                    justificationId: item.justificationId,
+                    submitDate: item.submitDate,
+                };
+            });
+
+            const justifications  = transformedTestJustification;
+
+            return c.json({ justifications });
+
+
+    })  
+
+    .get("/verify/admin/:justificationId", adminMiddleware, zValidator('param', z.object({ justificationId: z.coerce.number() })),
+        async (c) => {
+            const { justificationId } = c.req.valid('param');
+
+            const justification = await getJustification(justificationId);
+
+            if (!justification || !justification.testEventId && !justification.subjectEventId) return c.json({ error: "Justification not found" }, 404);
+
+            const base64File = justification?.fileData.toString('base64'); 
+
+            const [subjectEvents] = await db.select({
+                studentname: user.name,
+                studentEmail: user.email,
+
+
+                subjectName: subject.name,
+                assessmentType: teacherAssignment.assessment_type,
+                eventDate: assessmentTest.testDate,
+                testName: assessmentTest.name,
+            })
+            .from(assessmentTestEvent).innerJoin( assessmentTest, eq(assessmentTest.id, assessmentTestEvent.assessmentTestId))
+            .innerJoin( teacherAssignment, eq(teacherAssignment.id, assessmentTest.assessmentId))
+            .where(
+                and(
+                    eq(teacherAssignment.assessment_type, 'exam'),
+                    eq(assessmentTestEvent.id, justification.testEventId!)
+                )
+            )
+            .innerJoin( user, eq(user.id, assessmentTestEvent.studentId))
+            .innerJoin( specialtySubject, eq(specialtySubject.id, teacherAssignment.specialtySubjectId))
+            .innerJoin( subject, eq(subject.id, specialtySubject.subjectId))
+
+            if (!subjectEvents) return c.json({ error: "Subject event not found" }, 404);
+
+            const subjectEvent = {
+                studentname: subjectEvents.studentname,
+                studentEmail: subjectEvents.studentEmail,
+
+                subjectName: subjectEvents.subjectName,
+                assessmentType: subjectEvents.assessmentType,
+                eventDate: subjectEvents.testName + ' - ' + subjectEvents.eventDate
+            }
+            return c.json({ subjectEvent, justification: { ...justification, fileData: base64File } });
+        })   
+    
+    .post("/verify/admin/:justificationId", adminMiddleware, 
+        zValidator('param', z.object({ justificationId: z.coerce.number() })),
+        zValidator('json', verifySchema.extend({ status: z.nativeEnum(JustificationStatus) })),
+        async (c) => {
+            const { justificationId } = c.req.valid('param');
+            const { reason, status } = c.req.valid('json');
+
+            const justification = await getJustification(justificationId);
+            if (!justification || !justification.testEventId && !justification.subjectEventId) return c.json({ error: "Justification not found" }, 404);
+           
+            const testEvent = await db.select({
+                id: assessmentTestEvent.id,
+            })
+            .from(assessmentTestEvent).innerJoin( assessmentTest, eq(assessmentTest.id, assessmentTestEvent.assessmentTestId))
+            .where(
+                and(
+                    eq(assessmentTestEvent.id, justification.testEventId!)
+                )
+            )
+            if (!testEvent) return c.json({ error: "Test event not found" }, 404);
+            
+            const updatedJustification = await updateJustification({justificationId: justification.id, reason, status});
+            
+
+            return c.json({ justification: updatedJustification });
+
+        }) 
+    
 
 export default app
 
 
+const getJustification = async (justificationId: number) => {
+    const [justification] = await db
+    .select()
+    .from(absenceJustification)
+    .where(
+            eq(absenceJustification.id, justificationId)
+    );
+
+    return justification;
+}
+
+const updateJustification = async ({reason, status, justificationId}: {reason: string | undefined, status: JustificationStatus, justificationId: number}) => {
+
+
+    const submit_date = new Date().toISOString().split('T')[0];
+
+    const reasonToUpdate = reason === "" ? null : reason;
+    console.log(typeof reasonToUpdate)
+    
+    const [updatedJustification] = await db.update(absenceJustification).set({
+        verificationDate: submit_date,
+        status: status,
+        reason: reasonToUpdate,
+    }).where(
+        eq(absenceJustification.id, justificationId)
+    ).returning();
+
+    if(updatedJustification.status === JustificationStatus.APPROVED) {
+        if(updatedJustification.justificationType === 'session' && updatedJustification.subjectEventId) {
+
+            await db.update(studentSubjectEvent).set({
+                event: Events.ABSENCE_JUSTIFIED,
+            }).where(
+                eq(studentSubjectEvent.id, updatedJustification.subjectEventId)
+            )
+        } else if(updatedJustification.justificationType === 'test' && updatedJustification.testEventId) {
+            await db.update(assessmentTestEvent).set({
+                event: Events.ABSENCE_JUSTIFIED,
+            }).where(
+                eq(assessmentTestEvent.id, updatedJustification.testEventId)
+            )
+        }
+    }else {
+        if(updatedJustification.justificationType === 'session' && updatedJustification.subjectEventId) {
+
+            await db.update(studentSubjectEvent).set({
+                event: Events.ABSENCE,
+            }).where(
+                eq(studentSubjectEvent.id, updatedJustification.subjectEventId)
+            )
+        } else if(updatedJustification.justificationType === 'test' && updatedJustification.testEventId) {
+            await db.update(assessmentTestEvent).set({
+                event: Events.ABSENCE,
+            }).where(
+                eq(assessmentTestEvent.id, updatedJustification.testEventId)
+            )
+        }
+    }
+    return updatedJustification;
+}

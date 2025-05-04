@@ -273,6 +273,10 @@ const app = new Hono<AdditionalContext>()
       const totalAbsence = assessments.reduce((total, assessment) => {
         return total + parseInt(assessment.absenceNumber, 10);
       }, 0);
+
+      const totalParticipation = assessments.reduce((total, assessment) => {
+        return total + parseInt(assessment.participationNumber, 10);
+      }, 0);
     
       const subjectStatus = totalAbsence >= 3 ? 'excluded' : 'enrolled';
 
@@ -280,6 +284,7 @@ const app = new Hono<AdditionalContext>()
         subject : {
           ...subjectInfo,
           totalAbsence,
+          totalParticipation,
           subjectStatus
         },
         assessments

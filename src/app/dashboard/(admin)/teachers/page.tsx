@@ -1,11 +1,12 @@
 
 // import { HeaderTitle } from "@/components/header-title"
 import TeachersList from "@/features/teachers/components/teachers-list"
-import { adminOnly } from "@/lib/admin-only"
+import { RoleOnly } from "@/lib/role-only"
+import { Role } from "@/lib/types";
 
 export default async function TeachersPage() {
   
-  await adminOnly() 
+  await RoleOnly({role: Role.ADMIN})
     
   return (
       <div className="flex flex-col h-full">

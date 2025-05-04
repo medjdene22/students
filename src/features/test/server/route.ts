@@ -111,6 +111,7 @@ const app = new Hono<AdditionalContext>()
             const teacher = c.get("teacher");
             const testData = c.req.valid('json');
             const { teacherAssignmentId } = c.req.valid('param');
+            console.log(testData)
             
             // Verify teacher has access to this assignment
             const [assignment] = await db

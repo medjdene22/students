@@ -106,7 +106,7 @@ export const AppealForm = ({
                   <FormControl>
                     <Textarea
                       placeholder="Explain the reason for your absence..."
-                      className="resize-none min-h-32"
+                      className="resize-none min-h-20"
                       {...field}
                     />
                   </FormControl>

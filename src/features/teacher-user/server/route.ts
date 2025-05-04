@@ -10,6 +10,7 @@ import {
   teacherAssignment,
   user,
 } from "@/db/schema";
+import { SendAbsenceEmail } from "@/lib/mail";
 import { AdditionalContext } from "@/lib/session-middleware";
 import { teacherMiddleware } from "@/lib/teacher-middleware";
 import { zValidator } from "@hono/zod-validator";
@@ -331,14 +332,19 @@ const app = new Hono<AdditionalContext>()
 
       // Verify teacher has access to this assignment
       const [assignment] = await db
-        .select()
+        .select({
+          subjectName: subject.name,
+          assignment: teacherAssignment.assessment_type,
+          specialtySubjectId: teacherAssignment.specialtySubjectId,
+        })
         .from(teacherAssignment)
         .where(
           and(
             eq(teacherAssignment.teacherId, teacher.id),
             eq(teacherAssignment.id, teacherAssignmentId),
           ),
-        );
+        ).innerJoin(specialtySubject, eq(specialtySubject.id, teacherAssignment.specialtySubjectId)
+        ).innerJoin(subject, eq(subject.id, specialtySubject.subjectId))  
 
       if (!assignment) return c.json({ error: "Unauthorized" }, 401);
 
@@ -357,6 +363,18 @@ const app = new Hono<AdditionalContext>()
         )
       );
 
+      if(event==='absence'){
+        const student = await getstudent(studentId)
+        await SendAbsenceEmail({
+          email: student.email,
+          studentName: student.name,
+          subjectName: assignment.subjectName + ': ' + assignment.assignment,
+          teacherName: teacher.name,
+          date: revisedDate,
+          subjectId: assignment.specialtySubjectId
+        })
+      }
+
       
       if (existingEvent) {
           const [resultEvent] = await db
@@ -371,7 +389,6 @@ const app = new Hono<AdditionalContext>()
               eq(studentSubjectEvent.eventDate, dateToStore)
             )
           ).returning();
-
 
         return c.json({ event: {
           ...resultEvent,
@@ -447,3 +464,16 @@ const app = new Hono<AdditionalContext>()
   )
 
 export default app;
+
+const getstudent = async (studentId: string) => {
+  const [student] = await db
+    .select({
+      name: user.name,
+      email: user.email, 
+    })
+    .from(user).where(eq(user.id, studentId))
+  
+  return student
+}
+
+

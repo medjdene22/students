@@ -1,12 +1,12 @@
 import { MajorSwitcher } from "@/features/major/components/major-switcher";
 import SpecialtiesList from "@/features/specialtie/components/specialties-list";
 import { EditMajor } from "@/features/major/components/edit-major";
-import { adminOnly } from "@/lib/admin-only";
-
+import { RoleOnly } from "@/lib/role-only";
+import { Role } from "@/lib/types";
 
 export default async function Page() {
 
-      await adminOnly() 
+      await RoleOnly({role: Role.ADMIN})
                    
     
   return (

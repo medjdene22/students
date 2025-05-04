@@ -17,12 +17,8 @@ export const JustificationWrapper = ({ justificationId }: JustificationProps) =>
 
   const { data, isLoading } = useGetJustification({ justificationId});
   
-  console.log("data", data)
   const justification = data?.justification;
   const subjectEvent = data?.subjectEvent;
-
-  
-  
 
   const handleViewDocument = () => {
     if (justification?.fileData) {
@@ -122,7 +118,7 @@ export const JustificationWrapper = ({ justificationId }: JustificationProps) =>
 };
 
 
-const getStatusBadge = (status: JustificationStatus) => {
+export const getStatusBadge = (status: JustificationStatus) => {
   switch (status) {
     case "pending":
       return (

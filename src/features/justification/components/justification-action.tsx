@@ -18,7 +18,7 @@ export const JustificationAction = ({ justification}: {justification: Justificat
     const { status } = justification
     const { mutate: deleteJustification, isPending } = useDeleteJustification()
 
-    const {open } = useEditModel({query: 'justification-student'})
+    const {open } = useEditModel({query: 'justification'})
 
     const handleOpen = () => {
         open(justification.justificationId)
