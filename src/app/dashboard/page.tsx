@@ -29,7 +29,9 @@ export default async function Page() {
         <TeacherProfile />
     </div>
     )
-  }  
+  }else if(user.role === "admin") {
+    redirect('/dashboard/majors')
+  }
 return (
 
     <div>

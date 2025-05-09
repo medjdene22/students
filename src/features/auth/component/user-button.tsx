@@ -8,12 +8,14 @@ import { Dotted } from "@/components/dotted"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useQueryClient } from "@tanstack/react-query"
 
 
 
 export const UserButton = () => {
 
     const router = useRouter();
+    const queryClient = useQueryClient();
     
     const logout = () => {
         authClient.signOut({
@@ -21,6 +23,8 @@ export const UserButton = () => {
                 onSuccess:() => {
                     router.push("/login");
                     toast.success("Logout successful");
+                    queryClient.invalidateQueries();
+                    queryClient.clear();
                 },
                 onError: ({error}) => {
                     toast.error(error.message);

@@ -16,6 +16,10 @@ export default function Header() {
   const pageConfig = {
     default: {
       title: "Home",
+      description: "welcome to the platform"
+    },
+    default_admin: {
+      title: "Home",
       description: "Monitor all of your teachers and students"
     },
     majors: {
@@ -54,7 +58,24 @@ export default function Header() {
     "subjects/[id]": {
       title: "Edit Subject",
       description: "Modify subject details and assignments"
+    },
+    "justifications": {
+      title: "Justifications",
+      description: "Here you can see all the justifications you submitted"
+    },  
+    "justifications_teacher": {
+      title: "Justifications",
+      description: "Here you can approve or reject justifications of students"
+    }, 
+    "justifications_admin": {
+      title: "Justifications",
+      description: "Here you can approve or reject justifications of Exams absences"
+    }  ,
+    "class": {
+      title: "Subject Summary",
+      description: "See attendance history and grades of your subject"
     }
+
   };
 
   // Determine the current path pattern
@@ -86,20 +107,21 @@ export default function Header() {
           }
         }
       }
-    }
-
-    // Handle dashboard routes
-    if (base === "teachers") {
+    }else if (base === "teachers") {
       return "teachers";
-    }
-
-    if (base === "subjects") {
+    }else if (base === "subjects") {
       if (pathSegments.length === 1) return "subjects";
 
       if (pathSegments.length === 2 && !isNaN(Number(pathSegments[1]))) {
         return "subjects/[id]";
       }
-    }
+    }else if (base === "justifications") {
+      if (role === Role.TEACHER) return "justifications_teacher";
+      if (role === Role.ADMIN) return "justifications_admin";
+      return "justifications"
+    }else if (base === "class") {
+      return "class"
+    }  
 
     return "default";
   };
@@ -112,12 +134,10 @@ export default function Header() {
       <div className="flex items-center gap-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-10 hidden lg:flex" />
-        {role === Role.ADMIN && (
           <div className="flex-col hidden lg:flex">
             <h1 className="text-2xl font-semibold">{title}</h1>
             <p className="text-muted-foreground">{description}</p>
           </div>
-        )}
       </div>
 
       <UserButton />

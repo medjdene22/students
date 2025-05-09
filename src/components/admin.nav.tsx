@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { useGetMajors } from "@/features/major/api/use-get-majors"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 
@@ -28,8 +28,11 @@ export function AdminNav() {
 
     const pathname = usePathname();
     const {data: majors} = useGetMajors(); 
+    const router = useRouter();
 
-    const isMajorsActive = pathname.includes("/dashboard/majors");
+    const isInMajors = pathname.includes("/dashboard/majors");
+
+    const isInMajorsActive = pathname === `/dashboard/majors`;
 
     const isSubjectsActive = pathname.includes("/dashboard/subjects");
 
@@ -47,8 +50,8 @@ export function AdminNav() {
             >
                 <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip='Majors' className={cn("font-semibold ", isMajorsActive && "group-data-[collapsible=icon]:bg-black rounded-md group-data-[collapsible=icon]:text-white font-semibold")}>
-                        <Microscope className="mr-2 h-4 w-4" />
+                    <SidebarMenuButton tooltip='Majors' className={cn("font-semibold", isInMajorsActive && "bg-black rounded-md font-semibold text-white", isInMajors && "group-data-[collapsible=icon]:bg-black group-data-[collapsible=icon]:rounded-md group-data-[collapsible=icon]:text-white font-semibold")} >
+                        <Microscope onClick={() => {router.push("/dashboard/majors")}} className="mr-2 h-4 w-4" />
                         <span>Majors</span>
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
